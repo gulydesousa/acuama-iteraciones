@@ -1,0 +1,2 @@
+UPDATE P SET pgsvalor=1
+FROM parametros AS P WHERE pgsclave='INSPECCION_NOTIF_INTENTOS'

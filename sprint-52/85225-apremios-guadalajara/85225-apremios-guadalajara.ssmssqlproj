@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<SqlWorkbenchSqlProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="85225-apremios-guadalajara">
+  <Items>
+    <LogicalFolder Name="Connections" Type="2" Sorted="true">
+      <Items>
+        <ConnectionNode Name="SQLDESA41:D3ploy2020">
+          <Created>2024-04-12T09:01:49.3004349+02:00</Created>
+          <Type>SQL</Type>
+          <Server>SQLDESA41</Server>
+          <UserName>D3ploy2020</UserName>
+          <Authentication>SQL</Authentication>
+          <InitialDB>master</InitialDB>
+          <LoginTimeout>30</LoginTimeout>
+          <TrustServerCertificate>False</TrustServerCertificate>
+          <EncryptionOption>True</EncryptionOption>
+          <ExecutionTimeout>0</ExecutionTimeout>
+          <ConnectionProtocol>NotSpecified</ConnectionProtocol>
+          <ApplicationName>Microsoft SQL Server Management Studio - Query</ApplicationName>
+        </ConnectionNode>
+      </Items>
+    </LogicalFolder>
+    <LogicalFolder Name="Queries" Type="0" Sorted="true">
+      <Items>
+        <FileNode Name="ApremiosCab_Select.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SQLDESA41:False:D3ploy2020</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SQLDESA41</AssociatedConnSrvName>
+          <AssociatedConnUserName>D3ploy2020</AssociatedConnUserName>
+          <FullPath>ApremiosCab_Select.sql</FullPath>
+        </FileNode>
+        <FileNode Name="ApremiosCab_SelectPorFiltro.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SQLDESA41:False:D3ploy2020</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SQLDESA41</AssociatedConnSrvName>
+          <AssociatedConnUserName>D3ploy2020</AssociatedConnUserName>
+          <FullPath>ApremiosCab_SelectPorFiltro.sql</FullPath>
+        </FileNode>
+      </Items>
+    </LogicalFolder>
+    <LogicalFolder Name="Miscellaneous" Type="3" Sorted="true">
+      <Items>
+        <FileNode Name="ApremiosTrab_Select.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SQLDESA41:False:D3ploy2020</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SQLDESA41</AssociatedConnSrvName>
+          <AssociatedConnUserName>D3ploy2020</AssociatedConnUserName>
+          <FullPath>Miscelaneos/ApremiosTrab_Select.sql</FullPath>
+        </FileNode>
+        <FileNode Name="ApremiosRectificativa.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SQLDESA41:False:D3ploy2020</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SQLDESA41</AssociatedConnSrvName>
+          <AssociatedConnUserName>D3ploy2020</AssociatedConnUserName>
+          <FullPath>Miscelaneos/ApremiosRectificativa.sql</FullPath>
+        </FileNode>
+      </Items>
+    </LogicalFolder>
+  </Items>
+</SqlWorkbenchSqlProject>

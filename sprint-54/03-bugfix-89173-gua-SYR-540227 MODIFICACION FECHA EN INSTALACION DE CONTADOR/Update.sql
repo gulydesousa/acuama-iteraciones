@@ -1,0 +1,4 @@
+SELECT * 
+--UPDATE C SET C.ctcFec = '20231226'
+FROM ctrcon AS C
+WHERE ctcCtr=64325 

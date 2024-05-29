@@ -1,0 +1,1 @@
+CREATE TYPE tOtDatosValorApto AS TABLE (objectId INT PRIMARY KEY, Apto   VARCHAR(25))

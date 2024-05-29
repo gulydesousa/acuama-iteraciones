@@ -1,0 +1,6 @@
+C:\Sacyr\workspace-git\Sacyr.Acuama\classic\Tests_AppBL\obj\Debug\net5.0\Tests_AppBL.csproj.AssemblyReference.cache
+C:\Sacyr\workspace-git\Sacyr.Acuama\classic\Tests_AppBL\obj\Debug\net5.0\Tests_AppBL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Sacyr\workspace-git\Sacyr.Acuama\classic\Tests_AppBL\obj\Debug\net5.0\Tests_AppBL.AssemblyInfoInputs.cache
+C:\Sacyr\workspace-git\Sacyr.Acuama\classic\Tests_AppBL\obj\Debug\net5.0\Tests_AppBL.AssemblyInfo.cs
+C:\Sacyr\workspace-git\Sacyr.Acuama\classic\Tests_AppBL\obj\Debug\net5.0\Tests_AppBL.csproj.CoreCompileInputs.cache
+C:\Sacyr\workspace-git\Sacyr.Acuama\classic\Tests_AppBL\obj\Debug\net5.0\Tests_AppBL.sourcelink.json

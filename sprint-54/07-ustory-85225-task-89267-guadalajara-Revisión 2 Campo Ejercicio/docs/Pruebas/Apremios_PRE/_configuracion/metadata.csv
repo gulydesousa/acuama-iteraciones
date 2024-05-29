@@ -1,0 +1,8 @@
+INDICE;INICIO;LONGITUD;TIPO;DESCRIPCION
+T_LINEA;1;2;;Tipo de Linea
+N_FAC;13;7;N;"Numero de valor: ""Numero factura""
+IMP;25;12;N; "Principal (Centimos de euro): Incluye iva"
+F_EMISION;326;8;N;"Fecha Emision (AAAAMMDD) en voluntaria: ""Fecha de emision"""
+F_NOTIF;334;8;N;"Fecha Notificacion (AAAAMMDD) en voluntaria: ""Fecha de periodo de consumo"""
+F_VENC;342;8;N;Fecha de Vencimiento (AAAAMMDD), Final del periodo voluntario OBLIGATORIO
+ANYO_LIQ;350;4;4;Anyo al que se refiere la liqudación YYYY

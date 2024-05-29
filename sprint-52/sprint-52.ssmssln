@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# SQL Server Management Studio Solution File, Format Version 20.00
+VisualStudioVersion = 15.0.28307.421
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "85203-sii-facturas-sin-iva", "85203-sii-facturas-sin-iva\85203-sii-facturas-sin-iva.ssmssqlproj", "{3D5A5772-04DA-4F06-B211-6F1E5FF4898C}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "75588-telelectura-contazara", "75588-telelectura-contazara\75588-telelectura-contazara.ssmssqlproj", "{DB018C02-C2B0-4C1A-ACF7-CE0C4C65A01D}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "85263-oauth-contazara", "85263-oauth-contazara\85263-oauth-contazara.ssmssqlproj", "{FCC9FA50-F3F4-4E7D-ABFA-20D59FFC13F5}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "85717-contratos-por-ruta-informes-excel", "85717-contratos-por-ruta-informes-excel\85717-contratos-por-ruta-informes-excel.ssmssqlproj", "{B84FB67D-8FE3-4EEA-99ED-627D57F61219}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "85820-ov-online-usuarios", "85820-ov-online-usuarios\85820-ov-online-usuarios.ssmssqlproj", "{07D8E632-5B55-4A5B-90FB-9BFCA21B0958}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "86099-biar-envio-seres", "86099-biar-envio-seres\86099-biar-envio-seres.ssmssqlproj", "{00E9EAA0-74FC-4800-A80A-19FF153E84DE}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "86156-cobro-medio-pago", "86156-cobro-medio-pago\86156-cobro-medio-pago.ssmssqlproj", "{65A18554-053E-4A4F-B786-356906CB5CC3}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "77733-notificaciones", "77733-notificaciones\77733-notificaciones.ssmssqlproj", "{A15D0F12-A9AB-4893-9242-E4B20A2C0031}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "85225-apremios-guadalajara", "85225-apremios-guadalajara\85225-apremios-guadalajara.ssmssqlproj", "{1B53D1AC-DB9E-4487-B496-BBC6E4B08A44}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "MIscelaneos", "MIscelaneos\MIscelaneos.ssmssqlproj", "{D3E915C2-BAC0-40AF-BCAA-82658E9BE8AA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Default|Default = Default|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3D5A5772-04DA-4F06-B211-6F1E5FF4898C}.Default|Default.ActiveCfg = Default
+		{DB018C02-C2B0-4C1A-ACF7-CE0C4C65A01D}.Default|Default.ActiveCfg = Default
+		{FCC9FA50-F3F4-4E7D-ABFA-20D59FFC13F5}.Default|Default.ActiveCfg = Default
+		{B84FB67D-8FE3-4EEA-99ED-627D57F61219}.Default|Default.ActiveCfg = Default
+		{07D8E632-5B55-4A5B-90FB-9BFCA21B0958}.Default|Default.ActiveCfg = Default
+		{00E9EAA0-74FC-4800-A80A-19FF153E84DE}.Default|Default.ActiveCfg = Default
+		{65A18554-053E-4A4F-B786-356906CB5CC3}.Default|Default.ActiveCfg = Default
+		{A15D0F12-A9AB-4893-9242-E4B20A2C0031}.Default|Default.ActiveCfg = Default
+		{1B53D1AC-DB9E-4487-B496-BBC6E4B08A44}.Default|Default.ActiveCfg = Default
+		{D3E915C2-BAC0-40AF-BCAA-82658E9BE8AA}.Default|Default.ActiveCfg = Default
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D08353F8-186A-478F-B3E3-FA3B9F1E785D}
+	EndGlobalSection
+EndGlobal
