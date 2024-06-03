@@ -1,12 +1,12 @@
 {
   "ExpandedNodes": [
     "",
-    "\\04-bugfix-89029-melilla-notificaciones\\ENS",
-    "\\07-ustory-85225-task-89267-guadalajara-Revisión 2 Campo Ejercicio\\docs",
-    "\\07-ustory-85225-task-89267-guadalajara-Revisión 2 Campo Ejercicio\\docs\\ENS",
-    "\\15-bugfix-89318-melilla-formato cartas notificaciones",
-    "\\15-bugfix-89318-melilla-formato cartas notificaciones\\CSV_CARGA"
+    "\\08-bugfix-89591-avg-modelo762-canon-avg",
+    "\\08-bugfix-89591-avg-modelo762-canon-avg\\DOCS",
+    "\\15-bugfix-89318-melilla-formato cartas notificaciones\\CSV_CARGA",
+    "\\17-bugfix-90328-melilla-cartas notificaciones no aptas",
+    "\\18-bugfix-89591-avg-modelo762-canon-avg\\DOCS"
   ],
-  "SelectedNode": "\\15-bugfix-89318-melilla-formato cartas notificaciones\\readme.md",
+  "SelectedNode": "\\17-bugfix-90328-melilla-cartas notificaciones no aptas\\Select.sql",
   "PreviewInSolutionExplorer": false
 }

@@ -50,8 +50,14 @@ AS
 	, [Servicio] = I.servicio
 	, [Contrato General] = I.CTRCOD_INSPECCION
 	, [Contrato Abonado] = I.ctrcod
-	--Dirección como se saca en la pegatina
+	--**************************************
+	--Datos de la pegatina
 	, [Dirección Postal] = ISNULL(N.FISDIR1, N.INMUEBLE)
+	, [Tipo Destinatario] = CASE WHEN N.emisionID IS NULL THEN NULL 
+								 WHEN emisionEstado='Emitir' THEN 'Titular' 
+								 ELSE 'Representante' END
+	, [Destinatario] = N.FISNOM
+	--**************************************
 	, [Inspección Apta] = I.Apta
 	, [Fecha emisión] = NE.fecha
 	, [Notificacion ID] = FORMAT(N.EmisionID, 'D4') + '-' + FORMAT(ISNULL(N.RN, 0), 'D6')
@@ -75,6 +81,7 @@ AS
 	AND E.contrato = N.CONTRATO
 	AND E.ot_inspeccion = N.otNum
 	AND E.notificacionid = I.notificacionid
+
 
 
 	ORDER BY I.objectid

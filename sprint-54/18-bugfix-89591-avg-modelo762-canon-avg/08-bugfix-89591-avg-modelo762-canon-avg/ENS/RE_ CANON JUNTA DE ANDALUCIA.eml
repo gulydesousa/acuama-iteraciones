@@ -1,0 +1,906 @@
+Received: from AM0P193MB0481.EURP193.PROD.OUTLOOK.COM (2603:10a6:20b:16d::21)
+ by AM9P193MB0917.EURP193.PROD.OUTLOOK.COM with HTTPS; Tue, 28 May 2024
+ 10:45:36 +0000
+Received: from DB9P193MB1260.EURP193.PROD.OUTLOOK.COM (2603:10a6:10:254::19)
+ by AM0P193MB0481.EURP193.PROD.OUTLOOK.COM (2603:10a6:20b:16d::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.30; Tue, 28 May
+ 2024 10:45:34 +0000
+Received: from DB9P193MB1260.EURP193.PROD.OUTLOOK.COM
+ ([fe80::8ed:2066:8794:a2dd]) by DB9P193MB1260.EURP193.PROD.OUTLOOK.COM
+ ([fe80::8ed:2066:8794:a2dd%4]) with mapi id 15.20.7611.030; Tue, 28 May 2024
+ 10:45:34 +0000
+From: Margarita Mateo Carrillo <mmcarrillo@sacyr.com>
+To: Guly Mary de Sousa Garrido <neoris_gmdesousa@sacyr.com>
+CC: Margarita Mateo Carrillo <mmcarrillo@sacyr.com>
+Subject: RE: CANON JUNTA DE ANDALUCIA
+Thread-Topic: CANON JUNTA DE ANDALUCIA
+Thread-Index: Adqw4MoRr0wuALMyS5+FYURdo5Sy1gACdBVAAABgqKA=
+Date: Tue, 28 May 2024 10:45:34 +0000
+Message-ID:
+	<DB9P193MB12607E0892EABF25877AB1C0CBF12@DB9P193MB1260.EURP193.PROD.OUTLOOK.COM>
+References:
+	<DB9P193MB1260A4580CA4475E7C79097CCBF12@DB9P193MB1260.EURP193.PROD.OUTLOOK.COM>
+ <DB9P193MB1260B157D0989E9A93CAC161CBF12@DB9P193MB1260.EURP193.PROD.OUTLOOK.COM>
+In-Reply-To:
+	<DB9P193MB1260B157D0989E9A93CAC161CBF12@DB9P193MB1260.EURP193.PROD.OUTLOOK.COM>
+Accept-Language: es-ES, en-US
+Content-Language: es-ES
+X-MS-Exchange-Organization-AuthAs: Internal
+X-MS-Exchange-Organization-AuthMechanism: 04
+X-MS-Exchange-Organization-AuthSource: DB9P193MB1260.EURP193.PROD.OUTLOOK.COM
+X-MS-Exchange-Organization-ComplianceLabelId:
+	5eab1476-8dc6-4077-8101-84f4db34c3a4
+X-MS-Exchange-Organization-SupervisoryReview-OcrResultLocation:
+	{"Status":"OcrRequired","CorrelationId":null,"Locations":null}
+X-MS-Has-Attach: yes
+X-MS-Exchange-Organization-Network-Message-Id:
+	0cd2ea10-2f25-4741-a9e9-08dc7f034daf
+X-MS-Exchange-Organization-SCL: 1
+X-MS-TNEF-Correlator:
+X-MS-Exchange-Organization-RecordReviewCfmType: 0
+x-ms-traffictypediagnostic:
+	DB9P193MB1260:EE_|AM0P193MB0481:EE_|AM9P193MB0917:EE_
+x-ms-exchange-atpmessageproperties: SA|SL
+x-ms-publictraffictype: Email
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=sacyr.com;
+x-forefront-antispam-report:
+	CIP:255.255.255.255;CTRY:;LANG:es;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9P193MB1260.EURP193.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(366007)(41050700001);DIR:INT;
+x-microsoft-antispam: BCL:0;ARA:13230031|366007|41050700001;
+x-ms-exchange-transport-crosstenantheadersstamped: AM0P193MB0481
+x-ms-office365-filtering-correlation-id: 0cd2ea10-2f25-4741-a9e9-08dc7f034daf
+x-ms-exchange-crosstenant-network-message-id:
+	0cd2ea10-2f25-4741-a9e9-08dc7f034daf
+x-ms-exchange-crosstenant-originalarrivaltime: 28 May 2024 10:45:34.4260 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: 672bafce-0ccd-4867-8420-e8bb91862ae0
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname:
+	Q8f1ghpSzGK4jFcn6ckecbJ9Wh+puwpKe/BRp/fjoGW7u4jnqPDRezXrthsOASbiHyyyaZfxDaDh+hdhiQLduA==
+x-ms-exchange-crosstenant-authas: Internal
+x-ms-exchange-crosstenant-authsource: DB9P193MB1260.EURP193.PROD.OUTLOOK.COM
+x-ms-exchange-transport-endtoendlatency: 00:00:01.9311002
+x-ms-exchange-processed-by-bccfoldering: 15.20.7611.013
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:0;jmr:0;auth:0;dest:I;ENG:(910001)(944506478)(944626604)(920097)(425001)(930097)(140003)(1420198);
+X-Microsoft-Antispam-Message-Info:
+	yjrc8SWIpbBoAxmx2fzKqAIKVAroA42wunprrXw7cADzJMoahjqhU4fSjkl/GXGZC9Us420AnrVNsCOrtjwOSHV105go7NUFgcSzHMPKzE+152mzkC7D8zdNuODXG7VXYduXYIbwEPa6WJnlntZz04Y/BV/NwiKr7ALNblPMxDW/9gHub1X/fsBDJRcR9MLtzPqWSaPM9Er89p/azLsqKgp6Y9q+3CAacoExjocT0PvYeqpwiLSUtoplx3Lw8Y7ullnwRAJskkxdD2S9s4Q7cBkHV41FPhGSSo+AkUspFvUulyZdntcKOpUgciUjZ/WEYAodwfDU0eLOVUNEpu71MMUiHU2cWddRMvFAQEtON2V+cXfQQAb45eQwox09dcKPonIb+WI0Fz2suNmLAeyDBK7AyuBLWshBykH5zVCxSReLaiM+Ej57L2086d3Y4jZ74oXlGY1P+e0REzOuk0sJNrzirs90XDaa1SdSPeA9IZM3yjceIbhDINxtvKfOsWcnK9bFA8lZ4CZAFckKCCCCpU0ILz0VAJk226bg3kyyQJtR5qSFHg7tOn8t8VYPeLqV5kyO5DTgOT/30DDg6tvm+DGsKn9jcLGxYo+FEnK7s/gN3nXO5x42X3CQ7P5pBpHnSXgaussw/fenHc1t3rn5oZYNu794/Nyjuus9g0avatNAhAU7ZBxhEcAeT6/Q53R5LE1niBCZTPPH2tM2CNj1kNJ/8/7EkLg1Phld15mwJax2DGzeJaeKlJhcXtNCn0qi9PW7pWHJIU1Hm4jT7sL2BIp2Wqnmat2MTaP/Bw08cRdIohe3IYMeX5A8ZGLbSeHC7ViFB/ttPcebPLC+28PMpA==
+Content-Type: multipart/related;
+	boundary="_004_DB9P193MB12607E0892EABF25877AB1C0CBF12DB9P193MB1260EURP_";
+	type="multipart/alternative"
+MIME-Version: 1.0
+
+--_004_DB9P193MB12607E0892EABF25877AB1C0CBF12DB9P193MB1260EURP_
+Content-Type: multipart/alternative;
+	boundary="_000_DB9P193MB12607E0892EABF25877AB1C0CBF12DB9P193MB1260EURP_"
+
+--_000_DB9P193MB12607E0892EABF25877AB1C0CBF12DB9P193MB1260EURP_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Guly se me ha ido el a=F1o jajjajjaja, no es 2024, es 2022
+
+Margarita Mateo Carrillo
+Administraci=F3n y atenci=F3n al p=FAblico
+[cid:image001.png@01DAB0FC.EDE388D0]
+Paseo de Levante s/n. Edificio E Local 7 A. Puerto Deportivo 11310 Sotogran=
+de (C=E1diz) | T. 856 560 924 - T. 900 109 107 -  F. 956 910 618| infoavg@s=
+acyr.com<mailto:infoavg@sacyr.com>
+En cumplimiento del Reglamento (UE) 2016/679 del Parlamento Europeo y del C=
+onsejo de 27 de abril relativo a la protecci=F3n de las personas f=EDsicas =
+en lo que respecta al tratamiento de datos personales y a la libre circulac=
+i=F3n de estos, le informamos que los datos personales que nos facilite ser=
+=E1n incorporados a un fichero titularidad de Aguas del Valle del Guadiaro,=
+ S.L.U., CIF B72255102, Paseo de Levante s/n Edificio E Local 7 A, 11310 Pu=
+erto Deportivo Sotogrande, San Roque (C=E1diz), con la finalidad de proporc=
+ionarle el suministro de agua, as=ED como el resto de servicios contratados=
+ con la compa=F1=EDa.
+Los datos personales proporcionados se conservar=E1n mientras dure la relac=
+i=F3n contractual y, en todo caso, durante el plazo fijado por las disposic=
+iones legales vigentes y a efectos de las posibles responsabilidades aplica=
+bles. Los datos personales podr=E1n ser cedidos a empresas del Grupo Sacyr,=
+ al que pertenece la entidad y no se ceder=E1n a otros terceros, salvo obli=
+gaci=F3n legal. Podr=E1 ejercitar sus derechos de acceso, rectificaci=F3n, =
+supresi=F3n, oposici=F3n, limitaci=F3n del tratamiento y portabilidad de su=
+s datos dirigi=E9ndose a Sacyr, S.A. Paseo de la Castellana, 83-85, 28046 M=
+adrid o a protecciondedatos@sacyr.com<mailto:protecciondedatos@sacyr.com>, =
+mediante un escrito concretando su solicitud, acompa=F1ado de una fotocopia=
+ de su DNI, pasaporte o documento equivalente.
+Asimismo le informamos que, si considera vulnerados sus derechos podr=E1 pr=
+esentar una reclamaci=F3n ante la Agencia Espa=F1ola de Protecci=F3n de Dat=
+os (www.aepd.es<https://eur03.safelinks.protection.outlook.com/?url=3Dhttp%=
+3A%2F%2Fwww.aepd.es%2F&data=3D05%7C02%7Cneoris_gmdesousa%40sacyr.com%7C0cd2=
+ea102f254741a9e908dc7f034daf%7C672bafce0ccd48678420e8bb91862ae0%7C0%7C0%7C6=
+38524899364716121%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luM=
+zIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=3DGlEz0D%2BMJ66Zs%2B0r=
+kt9GlVzif2%2BgnBNl2VWS7CpOc7Y%3D&reserved=3D0>) o ante el Delegado de Prote=
+cci=F3n de Datos de Aguas del Valle del Guadiaro (dpo@sacyr.com<mailto:dpo@=
+sacyr.com>).
+Este mensaje es confidencial. Si usted ha recibido este mensaje por error, =
+no debe revelarlo, copiarlo, distribuirlo o usarlo en ning=FAn sentido. Le =
+rogamos que lo comunique al remitente y borre este mensaje y cualquier fich=
+ero adjunto que pudiera contener. No hay renuncia a la confidencialidad ni =
+a ning=FAn privilegio por causa de transmisi=F3n err=F3nea o mal funcionami=
+ento.
+This message is confidential. If you receive this message by mistake, you s=
+hould not disseminate, distribute or copy this e-mail. Please inform the se=
+nder and delete the message and attachments from your system. No confidenti=
+ality nor any privilege regarding the information is waived or lost by any =
+mistransmission or malfunction.
+
+De: Margarita Mateo Carrillo <mmcarrillo@sacyr.com>
+Enviado el: martes, 28 de mayo de 2024 12:44
+Para: Guly Mary de Sousa Garrido <neoris_gmdesousa@sacyr.com>
+CC: Margarita Mateo Carrillo <mmcarrillo@sacyr.com>
+Asunto: RE: CANON JUNTA DE ANDALUCIA
+
+7621000138351      Modelo anual 762
+7612000031474      Modelo 761 1=BA semestre 2024
+7612000042211      Modelo 761 2=BA semestre 2024
+
+Margarita Mateo Carrillo
+Administraci=F3n y atenci=F3n al p=FAblico
+[cid:image001.png@01DAB0FC.EDE388D0]
+Paseo de Levante s/n. Edificio E Local 7 A. Puerto Deportivo 11310 Sotogran=
+de (C=E1diz) | T. 856 560 924 - T. 900 109 107 -  F. 956 910 618| infoavg@s=
+acyr.com<mailto:infoavg@sacyr.com>
+En cumplimiento del Reglamento (UE) 2016/679 del Parlamento Europeo y del C=
+onsejo de 27 de abril relativo a la protecci=F3n de las personas f=EDsicas =
+en lo que respecta al tratamiento de datos personales y a la libre circulac=
+i=F3n de estos, le informamos que los datos personales que nos facilite ser=
+=E1n incorporados a un fichero titularidad de Aguas del Valle del Guadiaro,=
+ S.L.U., CIF B72255102, Paseo de Levante s/n Edificio E Local 7 A, 11310 Pu=
+erto Deportivo Sotogrande, San Roque (C=E1diz), con la finalidad de proporc=
+ionarle el suministro de agua, as=ED como el resto de servicios contratados=
+ con la compa=F1=EDa.
+Los datos personales proporcionados se conservar=E1n mientras dure la relac=
+i=F3n contractual y, en todo caso, durante el plazo fijado por las disposic=
+iones legales vigentes y a efectos de las posibles responsabilidades aplica=
+bles. Los datos personales podr=E1n ser cedidos a empresas del Grupo Sacyr,=
+ al que pertenece la entidad y no se ceder=E1n a otros terceros, salvo obli=
+gaci=F3n legal. Podr=E1 ejercitar sus derechos de acceso, rectificaci=F3n, =
+supresi=F3n, oposici=F3n, limitaci=F3n del tratamiento y portabilidad de su=
+s datos dirigi=E9ndose a Sacyr, S.A. Paseo de la Castellana, 83-85, 28046 M=
+adrid o a protecciondedatos@sacyr.com<mailto:protecciondedatos@sacyr.com>, =
+mediante un escrito concretando su solicitud, acompa=F1ado de una fotocopia=
+ de su DNI, pasaporte o documento equivalente.
+Asimismo le informamos que, si considera vulnerados sus derechos podr=E1 pr=
+esentar una reclamaci=F3n ante la Agencia Espa=F1ola de Protecci=F3n de Dat=
+os (www.aepd.es<https://eur03.safelinks.protection.outlook.com/?url=3Dhttp%=
+3A%2F%2Fwww.aepd.es%2F&data=3D05%7C02%7Cneoris_gmdesousa%40sacyr.com%7C0cd2=
+ea102f254741a9e908dc7f034daf%7C672bafce0ccd48678420e8bb91862ae0%7C0%7C0%7C6=
+38524899364732870%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luM=
+zIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=3Do6Q2cPYGWrLGaNf40dQo=
+MUygj8dFsyKpAbd9v7pE454%3D&reserved=3D0>) o ante el Delegado de Protecci=F3=
+n de Datos de Aguas del Valle del Guadiaro (dpo@sacyr.com<mailto:dpo@sacyr.=
+com>).
+Este mensaje es confidencial. Si usted ha recibido este mensaje por error, =
+no debe revelarlo, copiarlo, distribuirlo o usarlo en ning=FAn sentido. Le =
+rogamos que lo comunique al remitente y borre este mensaje y cualquier fich=
+ero adjunto que pudiera contener. No hay renuncia a la confidencialidad ni =
+a ning=FAn privilegio por causa de transmisi=F3n err=F3nea o mal funcionami=
+ento.
+This message is confidential. If you receive this message by mistake, you s=
+hould not disseminate, distribute or copy this e-mail. Please inform the se=
+nder and delete the message and attachments from your system. No confidenti=
+ality nor any privilege regarding the information is waived or lost by any =
+mistransmission or malfunction.
+
+De: Margarita Mateo Carrillo
+Enviado el: martes, 28 de mayo de 2024 11:25
+Para: Guly Mary de Sousa Garrido <neoris_gmdesousa@sacyr.com<mailto:neoris_=
+gmdesousa@sacyr.com>>
+CC: Margarita Mateo Carrillo <mmcarrillo@sacyr.com<mailto:mmcarrillo@sacyr.=
+com>>
+Asunto: CANON JUNTA DE ANDALUCIA
+
+7612000050252 este es el 1=BA semestre
+7612000063875 este es el 2=BA semestre
+
+Margarita Mateo Carrillo
+Administraci=F3n y atenci=F3n al p=FAblico
+[cid:image001.png@01DAB0FC.EDE388D0]
+Paseo de Levante s/n. Edificio E Local 7 A. Puerto Deportivo 11310 Sotogran=
+de (C=E1diz) | T. 856 560 924 - T. 900 109 107 -  F. 956 910 618| infoavg@s=
+acyr.com<mailto:infoavg@sacyr.com>
+En cumplimiento del Reglamento (UE) 2016/679 del Parlamento Europeo y del C=
+onsejo de 27 de abril relativo a la protecci=F3n de las personas f=EDsicas =
+en lo que respecta al tratamiento de datos personales y a la libre circulac=
+i=F3n de estos, le informamos que los datos personales que nos facilite ser=
+=E1n incorporados a un fichero titularidad de Aguas del Valle del Guadiaro,=
+ S.L.U., CIF B72255102, Paseo de Levante s/n Edificio E Local 7 A, 11310 Pu=
+erto Deportivo Sotogrande, San Roque (C=E1diz), con la finalidad de proporc=
+ionarle el suministro de agua, as=ED como el resto de servicios contratados=
+ con la compa=F1=EDa.
+Los datos personales proporcionados se conservar=E1n mientras dure la relac=
+i=F3n contractual y, en todo caso, durante el plazo fijado por las disposic=
+iones legales vigentes y a efectos de las posibles responsabilidades aplica=
+bles. Los datos personales podr=E1n ser cedidos a empresas del Grupo Sacyr,=
+ al que pertenece la entidad y no se ceder=E1n a otros terceros, salvo obli=
+gaci=F3n legal. Podr=E1 ejercitar sus derechos de acceso, rectificaci=F3n, =
+supresi=F3n, oposici=F3n, limitaci=F3n del tratamiento y portabilidad de su=
+s datos dirigi=E9ndose a Sacyr, S.A. Paseo de la Castellana, 83-85, 28046 M=
+adrid o a protecciondedatos@sacyr.com<mailto:protecciondedatos@sacyr.com>, =
+mediante un escrito concretando su solicitud, acompa=F1ado de una fotocopia=
+ de su DNI, pasaporte o documento equivalente.
+Asimismo le informamos que, si considera vulnerados sus derechos podr=E1 pr=
+esentar una reclamaci=F3n ante la Agencia Espa=F1ola de Protecci=F3n de Dat=
+os (www.aepd.es<https://eur03.safelinks.protection.outlook.com/?url=3Dhttp%=
+3A%2F%2Fwww.aepd.es%2F&data=3D05%7C02%7Cneoris_gmdesousa%40sacyr.com%7C0cd2=
+ea102f254741a9e908dc7f034daf%7C672bafce0ccd48678420e8bb91862ae0%7C0%7C0%7C6=
+38524899364747499%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luM=
+zIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=3Dg57TIbstYmPxQi5bLiyg=
+EB9d706NMHE9Lmur%2B1fBBhg%3D&reserved=3D0>) o ante el Delegado de Protecci=
+=F3n de Datos de Aguas del Valle del Guadiaro (dpo@sacyr.com<mailto:dpo@sac=
+yr.com>).
+Este mensaje es confidencial. Si usted ha recibido este mensaje por error, =
+no debe revelarlo, copiarlo, distribuirlo o usarlo en ning=FAn sentido. Le =
+rogamos que lo comunique al remitente y borre este mensaje y cualquier fich=
+ero adjunto que pudiera contener. No hay renuncia a la confidencialidad ni =
+a ning=FAn privilegio por causa de transmisi=F3n err=F3nea o mal funcionami=
+ento.
+This message is confidential. If you receive this message by mistake, you s=
+hould not disseminate, distribute or copy this e-mail. Please inform the se=
+nder and delete the message and attachments from your system. No confidenti=
+ality nor any privilege regarding the information is waived or lost by any =
+mistransmission or malfunction.
+
+
+--_000_DB9P193MB12607E0892EABF25877AB1C0CBF12DB9P193MB1260EURP_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
+//www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
+<!--[if !mso]><style>v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style><![endif]--><style><!--
+/* Font Definitions */
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;
+	mso-fareast-language:EN-US;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:#0563C1;
+	text-decoration:underline;}
+span.EstiloCorreo20
+	{mso-style-type:personal-reply;
+	font-family:"Calibri",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-size:10.0pt;}
+@page WordSection1
+	{size:612.0pt 792.0pt;
+	margin:70.85pt 3.0cm 70.85pt 3.0cm;}
+div.WordSection1
+	{page:WordSection1;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]-->
+</head>
+<body lang=3D"ES" link=3D"#0563C1" vlink=3D"#954F72" style=3D"word-wrap:bre=
+ak-word">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal">Guly se me ha ido el a=F1o jajjajjaja, no es 2024, e=
+s 2022<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<div>
+<p class=3D"MsoNormal"><b><span style=3D"font-family:&quot;Arial&quot;,sans=
+-serif;color:#002C58;mso-fareast-language:ES">Margarita Mateo Carrillo<o:p>=
+</o:p></span></b></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif;color:#00AFD2;mso-fareast-language:ES">Administraci=F3=
+n y atenci=F3n al p=FAblico<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"mso-fareast-language:ES"><img width=
+=3D"216" height=3D"87" style=3D"width:2.25in;height:.9062in" id=3D"Imagen_x=
+0020_3" src=3D"cid:image001.png@01DAB0FC.EDE388D0">&nbsp;&nbsp;&nbsp;&nbsp;=
+</span><span style=3D"mso-fareast-language:ES"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif;color:#999999;mso-fareast-language:ES">Paseo de Levant=
+e s/n. Edificio E Local 7 A. Puerto Deportivo 11310 Sotogrande (C=E1diz)</s=
+pan><span style=3D"color:#1F497D;mso-fareast-language:ES">
+</span><b><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,san=
+s-serif;color:#3399CC;mso-fareast-language:ES">|</span></b><span style=3D"c=
+olor:#1F497D;mso-fareast-language:ES">
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#3399CC;mso-fareast-language:ES">T.</span><span style=3D"color:#=
+1F497D;mso-fareast-language:ES">
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#999999;mso-fareast-language:ES">856 560 924 -
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#3399CC;mso-fareast-language:ES">T.
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#999999;mso-fareast-language:ES">900 109 107 -</span><span style=
+=3D"color:#1F497D;mso-fareast-language:ES">&nbsp;
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#3399CC;mso-fareast-language:ES">F.</span><span style=3D"color:#=
+1F497D;mso-fareast-language:ES">
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#999999;mso-fareast-language:ES">956 910 618</span><b><span styl=
+e=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-serif;color:#3399C=
+C;mso-fareast-language:ES">|</span></b><span style=3D"color:#1F497D;mso-far=
+east-language:ES">
+<a href=3D"mailto:infoavg@sacyr.com"><span style=3D"color:blue">infoavg@sac=
+yr.com</span></a>
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify"><span style=3D"font-siz=
+e:7.0pt;mso-fareast-language:ES">En cumplimiento del Reglamento (UE) 2016/6=
+79 del Parlamento Europeo y del Consejo de 27 de abril relativo a la protec=
+ci=F3n de las personas f=EDsicas en lo que
+ respecta al tratamiento de datos personales y a la libre circulaci=F3n de =
+estos, le informamos que los datos personales que nos facilite ser=E1n inco=
+rporados a un fichero titularidad de Aguas del Valle del Guadiaro, S.L.U., =
+CIF B72255102, Paseo de Levante s/n
+ Edificio E Local 7 A, 11310 Puerto Deportivo Sotogrande, San Roque (C=E1di=
+z), con la finalidad de proporcionarle el suministro de agua, as=ED como el=
+ resto de servicios contratados con la compa=F1=EDa.<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify"><span style=3D"font-siz=
+e:7.0pt;mso-fareast-language:ES">Los datos personales proporcionados se con=
+servar=E1n mientras dure la relaci=F3n contractual y, en todo caso, durante=
+ el plazo fijado por las disposiciones legales
+ vigentes y a efectos de las posibles responsabilidades aplicables. Los dat=
+os personales podr=E1n ser cedidos a empresas del Grupo Sacyr, al que perte=
+nece la entidad y no se ceder=E1n a otros terceros, salvo obligaci=F3n lega=
+l. Podr=E1 ejercitar sus derechos de acceso,
+ rectificaci=F3n, supresi=F3n, oposici=F3n, limitaci=F3n del tratamiento y =
+portabilidad de sus datos dirigi=E9ndose a Sacyr, S.A. Paseo de la Castella=
+na, 83-85, 28046 Madrid o a
+<u><a href=3D"mailto:protecciondedatos@sacyr.com"><span style=3D"color:wind=
+owtext">protecciondedatos@sacyr.com</span></a></u>, mediante un escrito con=
+cretando su solicitud, acompa=F1ado de una fotocopia de su DNI, pasaporte o=
+ documento equivalente.
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify"><span style=3D"font-siz=
+e:7.0pt;mso-fareast-language:ES">Asimismo le informamos que, si considera v=
+ulnerados sus derechos podr=E1 presentar una reclamaci=F3n ante la Agencia =
+Espa=F1ola de Protecci=F3n de Datos (<u><a href=3D"https://eur03.safelinks.=
+protection.outlook.com/?url=3Dhttp%3A%2F%2Fwww.aepd.es%2F&amp;data=3D05%7C0=
+2%7Cneoris_gmdesousa%40sacyr.com%7C0cd2ea102f254741a9e908dc7f034daf%7C672ba=
+fce0ccd48678420e8bb91862ae0%7C0%7C0%7C638524899364716121%7CUnknown%7CTWFpbG=
+Zsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C=
+0%7C%7C%7C&amp;sdata=3DGlEz0D%2BMJ66Zs%2B0rkt9GlVzif2%2BgnBNl2VWS7CpOc7Y%3D=
+&amp;reserved=3D0" originalsrc=3D"http://www.aepd.es/" shash=3D"HEoshurB2CU=
+e/FKsqqLI2CYYjmDCj/F9buDtgBluyYGcWrbvPmyXV5jbkjqvROQUyP7Zq5vUJNw1rGD7Ys7pW+=
+noJGyWhZO5JgkwbChGjq8qjah9fBPOeSuhLiUvdVvfOOe2dBfM3V9uasAyHp4ME3b+AWWpUQtKW=
+cm4pfaAquE=3D"><span style=3D"color:windowtext">www.aepd.es</span></a></u>)
+ o ante el Delegado de Protecci=F3n de Datos de Aguas del Valle del Guadiar=
+o (<u><a href=3D"mailto:dpo@sacyr.com"><span style=3D"color:windowtext">dpo=
+@sacyr.com</span></a></u>).<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:7.0pt;mso-fareast-language:=
+ES">Este mensaje es confidencial. Si usted ha recibido este mensaje por err=
+or, no debe revelarlo, copiarlo, distribuirlo o usarlo en ning=FAn sentido.=
+ Le rogamos que lo comunique al remitente
+ y borre este mensaje y cualquier fichero adjunto que pudiera contener. No =
+hay renuncia a la confidencialidad ni a ning=FAn privilegio por causa de tr=
+ansmisi=F3n err=F3nea o mal funcionamiento.<br>
+</span><span lang=3D"EN-US" style=3D"font-size:7.0pt;mso-fareast-language:E=
+S">This message is confidential. If you receive this message by mistake, yo=
+u should not disseminate, distribute or copy this e-mail. Please inform the=
+ sender and delete the message and attachments
+ from your system. No confidentiality nor any privilege regarding the infor=
+mation is waived or lost by any mistransmission or malfunction.<o:p></o:p><=
+/span></p>
+</div>
+<p class=3D"MsoNormal"><span lang=3D"EN-GB"><o:p>&nbsp;</o:p></span></p>
+<div>
+<div style=3D"border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0cm =
+0cm 0cm">
+<p class=3D"MsoNormal"><b><span style=3D"mso-fareast-language:ES">De:</span=
+></b><span style=3D"mso-fareast-language:ES"> Margarita Mateo Carrillo &lt;=
+mmcarrillo@sacyr.com&gt;
+<br>
+<b>Enviado el:</b> martes, 28 de mayo de 2024 12:44<br>
+<b>Para:</b> Guly Mary de Sousa Garrido &lt;neoris_gmdesousa@sacyr.com&gt;<=
+br>
+<b>CC:</b> Margarita Mateo Carrillo &lt;mmcarrillo@sacyr.com&gt;<br>
+<b>Asunto:</b> RE: CANON JUNTA DE ANDALUCIA<o:p></o:p></span></p>
+</div>
+</div>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:12.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif;mso-fareast-language:ES">7621000138351&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp; Modelo anual 762<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:12.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif;mso-fareast-language:ES">7612000031474&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp; Modelo 761 1=BA semestre 2024<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:12.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif;mso-fareast-language:ES">7612000042211&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp; Modelo 761 2=BA semestre 2024</span><o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<div>
+<p class=3D"MsoNormal"><b><span style=3D"font-family:&quot;Arial&quot;,sans=
+-serif;color:#002C58;mso-fareast-language:ES">Margarita Mateo Carrillo<o:p>=
+</o:p></span></b></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif;color:#00AFD2;mso-fareast-language:ES">Administraci=F3=
+n y atenci=F3n al p=FAblico<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"mso-fareast-language:ES"><img border=
+=3D"0" width=3D"216" height=3D"87" style=3D"width:2.25in;height:.9062in" id=
+=3D"Imagen_x0020_2" src=3D"cid:image001.png@01DAB0FC.EDE388D0"></span><span=
+ style=3D"mso-fareast-language:ES">&nbsp;&nbsp;&nbsp;&nbsp;<o:p></o:p></spa=
+n></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif;color:#999999;mso-fareast-language:ES">Paseo de Levant=
+e s/n. Edificio E Local 7 A. Puerto Deportivo 11310 Sotogrande (C=E1diz)</s=
+pan><span style=3D"color:#1F497D;mso-fareast-language:ES">
+</span><b><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,san=
+s-serif;color:#3399CC;mso-fareast-language:ES">|</span></b><span style=3D"c=
+olor:#1F497D;mso-fareast-language:ES">
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#3399CC;mso-fareast-language:ES">T.</span><span style=3D"color:#=
+1F497D;mso-fareast-language:ES">
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#999999;mso-fareast-language:ES">856 560 924 -
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#3399CC;mso-fareast-language:ES">T.
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#999999;mso-fareast-language:ES">900 109 107 -</span><span style=
+=3D"color:#1F497D;mso-fareast-language:ES">&nbsp;
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#3399CC;mso-fareast-language:ES">F.</span><span style=3D"color:#=
+1F497D;mso-fareast-language:ES">
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#999999;mso-fareast-language:ES">956 910 618</span><b><span styl=
+e=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-serif;color:#3399C=
+C;mso-fareast-language:ES">|</span></b><span style=3D"color:#1F497D;mso-far=
+east-language:ES">
+<a href=3D"mailto:infoavg@sacyr.com"><span style=3D"color:blue">infoavg@sac=
+yr.com</span></a>
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify"><span style=3D"font-siz=
+e:7.0pt;mso-fareast-language:ES">En cumplimiento del Reglamento (UE) 2016/6=
+79 del Parlamento Europeo y del Consejo de 27 de abril relativo a la protec=
+ci=F3n de las personas f=EDsicas en lo que
+ respecta al tratamiento de datos personales y a la libre circulaci=F3n de =
+estos, le informamos que los datos personales que nos facilite ser=E1n inco=
+rporados a un fichero titularidad de Aguas del Valle del Guadiaro, S.L.U., =
+CIF B72255102, Paseo de Levante s/n
+ Edificio E Local 7 A, 11310 Puerto Deportivo Sotogrande, San Roque (C=E1di=
+z), con la finalidad de proporcionarle el suministro de agua, as=ED como el=
+ resto de servicios contratados con la compa=F1=EDa.<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify"><span style=3D"font-siz=
+e:7.0pt;mso-fareast-language:ES">Los datos personales proporcionados se con=
+servar=E1n mientras dure la relaci=F3n contractual y, en todo caso, durante=
+ el plazo fijado por las disposiciones legales
+ vigentes y a efectos de las posibles responsabilidades aplicables. Los dat=
+os personales podr=E1n ser cedidos a empresas del Grupo Sacyr, al que perte=
+nece la entidad y no se ceder=E1n a otros terceros, salvo obligaci=F3n lega=
+l. Podr=E1 ejercitar sus derechos de acceso,
+ rectificaci=F3n, supresi=F3n, oposici=F3n, limitaci=F3n del tratamiento y =
+portabilidad de sus datos dirigi=E9ndose a Sacyr, S.A. Paseo de la Castella=
+na, 83-85, 28046 Madrid o a
+<u><a href=3D"mailto:protecciondedatos@sacyr.com"><span style=3D"color:wind=
+owtext">protecciondedatos@sacyr.com</span></a></u>, mediante un escrito con=
+cretando su solicitud, acompa=F1ado de una fotocopia de su DNI, pasaporte o=
+ documento equivalente.
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify"><span style=3D"font-siz=
+e:7.0pt;mso-fareast-language:ES">Asimismo le informamos que, si considera v=
+ulnerados sus derechos podr=E1 presentar una reclamaci=F3n ante la Agencia =
+Espa=F1ola de Protecci=F3n de Datos (<u><a href=3D"https://eur03.safelinks.=
+protection.outlook.com/?url=3Dhttp%3A%2F%2Fwww.aepd.es%2F&amp;data=3D05%7C0=
+2%7Cneoris_gmdesousa%40sacyr.com%7C0cd2ea102f254741a9e908dc7f034daf%7C672ba=
+fce0ccd48678420e8bb91862ae0%7C0%7C0%7C638524899364732870%7CUnknown%7CTWFpbG=
+Zsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C=
+0%7C%7C%7C&amp;sdata=3Do6Q2cPYGWrLGaNf40dQoMUygj8dFsyKpAbd9v7pE454%3D&amp;r=
+eserved=3D0" originalsrc=3D"http://www.aepd.es/" shash=3D"FMfxHBoILDSSmIEGA=
+G3nYnlwYzMfbINUIGiImepoAPX1uqQd2VDUISrMldsjS/L/LMqofHmOrpdZ5l8kUYwrLd8gwQ/d=
+t/SJgcQmgbeVyxfVn1hNSiJqDF4j7FFFyY2F0GQJcxKrap1wv0f2l6q5g1iiJ3MUfgGRgVwrHYC=
+EHyg=3D"><span style=3D"color:windowtext">www.aepd.es</span></a></u>)
+ o ante el Delegado de Protecci=F3n de Datos de Aguas del Valle del Guadiar=
+o (<u><a href=3D"mailto:dpo@sacyr.com"><span style=3D"color:windowtext">dpo=
+@sacyr.com</span></a></u>).<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:7.0pt;mso-fareast-language:=
+ES">Este mensaje es confidencial. Si usted ha recibido este mensaje por err=
+or, no debe revelarlo, copiarlo, distribuirlo o usarlo en ning=FAn sentido.=
+ Le rogamos que lo comunique al remitente
+ y borre este mensaje y cualquier fichero adjunto que pudiera contener. No =
+hay renuncia a la confidencialidad ni a ning=FAn privilegio por causa de tr=
+ansmisi=F3n err=F3nea o mal funcionamiento.<br>
+</span><span lang=3D"EN-US" style=3D"font-size:7.0pt;mso-fareast-language:E=
+S">This message is confidential. If you receive this message by mistake, yo=
+u should not disseminate, distribute or copy this e-mail. Please inform the=
+ sender and delete the message and attachments
+ from your system. No confidentiality nor any privilege regarding the infor=
+mation is waived or lost by any mistransmission or malfunction.<o:p></o:p><=
+/span></p>
+</div>
+<p class=3D"MsoNormal"><span lang=3D"EN-GB"><o:p>&nbsp;</o:p></span></p>
+<div>
+<div style=3D"border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0cm =
+0cm 0cm">
+<p class=3D"MsoNormal"><b><span style=3D"mso-fareast-language:ES">De:</span=
+></b><span style=3D"mso-fareast-language:ES"> Margarita Mateo Carrillo
+<br>
+<b>Enviado el:</b> martes, 28 de mayo de 2024 11:25<br>
+<b>Para:</b> Guly Mary de Sousa Garrido &lt;<a href=3D"mailto:neoris_gmdeso=
+usa@sacyr.com">neoris_gmdesousa@sacyr.com</a>&gt;<br>
+<b>CC:</b> Margarita Mateo Carrillo &lt;<a href=3D"mailto:mmcarrillo@sacyr.=
+com">mmcarrillo@sacyr.com</a>&gt;<br>
+<b>Asunto:</b> CANON JUNTA DE ANDALUCIA<o:p></o:p></span></p>
+</div>
+</div>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:12.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">7612000050252 este es el 1=BA semestre<o:p></o:p></sp=
+an></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:12.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">7612000063875 este es el 2=BA semestre</span><o:p></o=
+:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><b><span style=3D"font-family:&quot;Arial&quot;,sans=
+-serif;color:#002C58;mso-fareast-language:ES">Margarita Mateo Carrillo<o:p>=
+</o:p></span></b></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif;color:#00AFD2;mso-fareast-language:ES">Administraci=F3=
+n y atenci=F3n al p=FAblico<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"mso-fareast-language:ES"><img border=
+=3D"0" width=3D"216" height=3D"87" style=3D"width:2.25in;height:.9062in" id=
+=3D"Imagen_x0020_1" src=3D"cid:image001.png@01DAB0FC.EDE388D0"></span><span=
+ style=3D"mso-fareast-language:ES">&nbsp;&nbsp;&nbsp;&nbsp;<o:p></o:p></spa=
+n></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif;color:#999999;mso-fareast-language:ES">Paseo de Levant=
+e s/n. Edificio E Local 7 A. Puerto Deportivo 11310 Sotogrande (C=E1diz)</s=
+pan><span style=3D"color:#1F497D;mso-fareast-language:ES">
+</span><b><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,san=
+s-serif;color:#3399CC;mso-fareast-language:ES">|</span></b><span style=3D"c=
+olor:#1F497D;mso-fareast-language:ES">
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#3399CC;mso-fareast-language:ES">T.</span><span style=3D"color:#=
+1F497D;mso-fareast-language:ES">
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#999999;mso-fareast-language:ES">856 560 924 -
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#3399CC;mso-fareast-language:ES">T.
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#999999;mso-fareast-language:ES">900 109 107 -</span><span style=
+=3D"color:#1F497D;mso-fareast-language:ES">&nbsp;
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#3399CC;mso-fareast-language:ES">F.</span><span style=3D"color:#=
+1F497D;mso-fareast-language:ES">
+</span><span style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-s=
+erif;color:#999999;mso-fareast-language:ES">956 910 618</span><b><span styl=
+e=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-serif;color:#3399C=
+C;mso-fareast-language:ES">|</span></b><span style=3D"color:#1F497D;mso-far=
+east-language:ES">
+<a href=3D"mailto:infoavg@sacyr.com"><span style=3D"color:blue">infoavg@sac=
+yr.com</span></a>
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify"><span style=3D"font-siz=
+e:7.0pt;mso-fareast-language:ES">En cumplimiento del Reglamento (UE) 2016/6=
+79 del Parlamento Europeo y del Consejo de 27 de abril relativo a la protec=
+ci=F3n de las personas f=EDsicas en lo que
+ respecta al tratamiento de datos personales y a la libre circulaci=F3n de =
+estos, le informamos que los datos personales que nos facilite ser=E1n inco=
+rporados a un fichero titularidad de Aguas del Valle del Guadiaro, S.L.U., =
+CIF B72255102, Paseo de Levante s/n
+ Edificio E Local 7 A, 11310 Puerto Deportivo Sotogrande, San Roque (C=E1di=
+z), con la finalidad de proporcionarle el suministro de agua, as=ED como el=
+ resto de servicios contratados con la compa=F1=EDa.<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify"><span style=3D"font-siz=
+e:7.0pt;mso-fareast-language:ES">Los datos personales proporcionados se con=
+servar=E1n mientras dure la relaci=F3n contractual y, en todo caso, durante=
+ el plazo fijado por las disposiciones legales
+ vigentes y a efectos de las posibles responsabilidades aplicables. Los dat=
+os personales podr=E1n ser cedidos a empresas del Grupo Sacyr, al que perte=
+nece la entidad y no se ceder=E1n a otros terceros, salvo obligaci=F3n lega=
+l. Podr=E1 ejercitar sus derechos de acceso,
+ rectificaci=F3n, supresi=F3n, oposici=F3n, limitaci=F3n del tratamiento y =
+portabilidad de sus datos dirigi=E9ndose a Sacyr, S.A. Paseo de la Castella=
+na, 83-85, 28046 Madrid o a
+<u><a href=3D"mailto:protecciondedatos@sacyr.com"><span style=3D"color:wind=
+owtext">protecciondedatos@sacyr.com</span></a></u>, mediante un escrito con=
+cretando su solicitud, acompa=F1ado de una fotocopia de su DNI, pasaporte o=
+ documento equivalente.
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify"><span style=3D"font-siz=
+e:7.0pt;mso-fareast-language:ES">Asimismo le informamos que, si considera v=
+ulnerados sus derechos podr=E1 presentar una reclamaci=F3n ante la Agencia =
+Espa=F1ola de Protecci=F3n de Datos (<u><a href=3D"https://eur03.safelinks.=
+protection.outlook.com/?url=3Dhttp%3A%2F%2Fwww.aepd.es%2F&amp;data=3D05%7C0=
+2%7Cneoris_gmdesousa%40sacyr.com%7C0cd2ea102f254741a9e908dc7f034daf%7C672ba=
+fce0ccd48678420e8bb91862ae0%7C0%7C0%7C638524899364747499%7CUnknown%7CTWFpbG=
+Zsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C=
+0%7C%7C%7C&amp;sdata=3Dg57TIbstYmPxQi5bLiygEB9d706NMHE9Lmur%2B1fBBhg%3D&amp=
+;reserved=3D0" originalsrc=3D"http://www.aepd.es/" shash=3D"GgcKWkOZ1GjJMeG=
+JHFC/R2yX9CkHQcURb7LlG6cMDL5fg/PnkgIHPGrry6v+QpQc9PlVQDNV9oDRf1oQWSwBwbmNU3=
+zCuwdvNT1WT4Y6S7cQ7Chj5O0e/wxioxUcL9S6eIw8sGVkFOwn4Ws1nk0GEhLauQ1FQ2jMT+uO3=
+6JrSHw=3D"><span style=3D"color:windowtext">www.aepd.es</span></a></u>)
+ o ante el Delegado de Protecci=F3n de Datos de Aguas del Valle del Guadiar=
+o (<u><a href=3D"mailto:dpo@sacyr.com"><span style=3D"color:windowtext">dpo=
+@sacyr.com</span></a></u>).<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:7.0pt;mso-fareast-language:=
+ES">Este mensaje es confidencial. Si usted ha recibido este mensaje por err=
+or, no debe revelarlo, copiarlo, distribuirlo o usarlo en ning=FAn sentido.=
+ Le rogamos que lo comunique al remitente
+ y borre este mensaje y cualquier fichero adjunto que pudiera contener. No =
+hay renuncia a la confidencialidad ni a ning=FAn privilegio por causa de tr=
+ansmisi=F3n err=F3nea o mal funcionamiento.<br>
+</span><span lang=3D"EN-US" style=3D"font-size:7.0pt;mso-fareast-language:E=
+S">This message is confidential. If you receive this message by mistake, yo=
+u should not disseminate, distribute or copy this e-mail. Please inform the=
+ sender and delete the message and attachments
+ from your system. No confidentiality nor any privilege regarding the infor=
+mation is waived or lost by any mistransmission or malfunction.<o:p></o:p><=
+/span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-GB"><o:p>&nbsp;</o:p></span></p>
+</div>
+</body>
+</html>
+
+--_000_DB9P193MB12607E0892EABF25877AB1C0CBF12DB9P193MB1260EURP_--
+
+--_004_DB9P193MB12607E0892EABF25877AB1C0CBF12DB9P193MB1260EURP_
+Content-Type: image/png; name="image001.png"
+Content-Description: image001.png
+Content-Disposition: inline; filename="image001.png"; size=13943;
+	creation-date="Tue, 28 May 2024 10:45:34 GMT";
+	modification-date="Tue, 28 May 2024 10:45:36 GMT"
+Content-ID: <image001.png@01DAB0FC.EDE388D0>
+Content-Transfer-Encoding: base64
+
+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
+
+--_004_DB9P193MB12607E0892EABF25877AB1C0CBF12DB9P193MB1260EURP_--
