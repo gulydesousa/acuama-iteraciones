@@ -40,15 +40,14 @@ ORDER BY CONTRATO
 SELECT *
 --DELETE
 FROM otInspeccionesNotificacionEmisiones_Melilla
-WHERE  otineobjectid= 3510
-ORDER BY otineCtrCod
+WHERE  otineEmision=28
 
 SELECT * FROM otInspecciones_Melilla WHERE  objectid= 3264
 
 SELECT objectId, Servicio, CONTRATO, otApta 
 --DELETE
 FROM ReportingServices.TO039_EmisionNotificaciones_Notificaciones
-WHERE emisionID=10 AND objectid= 3264
+WHERE emisionID=28 AND objectid= 3264
 ORDER BY CONTRATO
 
 
@@ -88,16 +87,16 @@ WHERE ISNUMERIC(TITULARCPOSTAL)=0 AND otApta<>'APTO 100%'
 SELECT *
 --DELETE FROM E
 FROM otInspeccionesNotificacionEmisiones_Melilla AS E
-INNER JOIN  ReportingServices.TO039_EmisionNotificaciones_Notificaciones AS N
+LEFT JOIN  ReportingServices.TO039_EmisionNotificaciones_Notificaciones AS N
 ON N.objectid = E.otineObjectID
-WHERE LEN(FISDIR1)>50 AND emisionID<>24 AND otApta<>'APTO 100%'
+WHERE N.objectid IS NULL
 
 
 
 SELECT FISNOM, LEN(FISNOM), emisionID
 --DELETE
 FROM ReportingServices.TO039_EmisionNotificaciones_Notificaciones
-WHERE LEN(FISDIR1)>50 AND emisionID<>24 AND otApta<>'APTO 100%'
+WHERE LEN(FISNOM)>30 AND emisionID<>24 AND otApta<>'APTO 100%'
 
 SELECT FISDIR1 , LEN(FISDIR1) FROM ReportingServices.TO039_EmisionNotificaciones_Notificaciones ORDER BY LEN(FISDIR1)
 

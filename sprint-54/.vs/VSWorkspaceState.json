@@ -1,12 +1,14 @@
 {
   "ExpandedNodes": [
     "",
-    "\\08-bugfix-89591-avg-modelo762-canon-avg",
-    "\\08-bugfix-89591-avg-modelo762-canon-avg\\DOCS",
-    "\\15-bugfix-89318-melilla-formato cartas notificaciones\\CSV_CARGA",
-    "\\17-bugfix-90328-melilla-cartas notificaciones no aptas",
-    "\\18-bugfix-89591-avg-modelo762-canon-avg\\DOCS"
+    "\\19-soporte-90543-melilla-revision-publicacion-ot-inspecciones\\Misc",
+    "\\19-soporte-90543-melilla-revision-publicacion-ot-inspecciones\\NOTIFICACIONES_CONFIGURACION\\sprints47-54_01_menu",
+    "\\19-soporte-90543-melilla-revision-publicacion-ot-inspecciones\\NOTIFICACIONES_CONFIGURACION\\sprints47-54_02_tasktypes",
+    "\\19-soporte-90543-melilla-revision-publicacion-ot-inspecciones\\NOTIFICACIONES_CONFIGURACION\\sprints47-54_03_informes-excel",
+    "\\19-soporte-90543-melilla-revision-publicacion-ot-inspecciones\\NOTIFICACIONES_CONFIGURACION\\sprints47-54_10_inserts",
+    "\\19-soporte-90543-melilla-revision-publicacion-ot-inspecciones\\NOTIFICACIONES_CONFIGURACION\\sprints47-54_20_Drop",
+    "\\19-soporte-90543-melilla-revision-publicacion-ot-inspecciones\\NOTIFICACIONES_CONFIGURACION\\sprints47-54_20_Updates"
   ],
-  "SelectedNode": "\\17-bugfix-90328-melilla-cartas notificaciones no aptas\\Select.sql",
+  "SelectedNode": "\\19-soporte-90543-melilla-revision-publicacion-ot-inspecciones",
   "PreviewInSolutionExplorer": false
 }

@@ -1,3 +1,4 @@
+
 /*
 DECLARE @fechaFacturaD AS DATETIME = '20230101',
 @fechaFacturaH AS DATETIME = '20231231',
@@ -7,8 +8,7 @@ DECLARE @fechaFacturaD AS DATETIME = '20230101',
 @periodoH AS VARCHAR(6) = NULL,
 @zonaD AS VARCHAR(4) = NULL,
 @zonaH AS VARCHAR(4) = NULL,
-@contrato AS INT = 141,  
-@version AS INT
+@contrato AS INT = NULL,  @version AS INT = NULL
 
 EXEC [dbo].[Liquidaciones_Select_AVG_Detalle] 
 @fechaFacturaD, @fechaFacturaH,
@@ -18,7 +18,7 @@ EXEC [dbo].[Liquidaciones_Select_AVG_Detalle]
 @contrato, @version;
 */
 
-ALTER PROCEDURE [dbo].[Liquidaciones_Select_AVG_Detalle]
+CREATE PROCEDURE [dbo].[Liquidaciones_Select_AVG_Detalle]
 @fechaFacturaD AS DATETIME = NULL,
 @fechaFacturaH AS DATETIME = NULL,
 @fechaLiquidacionD AS DATETIME = NULL,
@@ -254,6 +254,5 @@ WHERE YEAR(@fechaFacturaD) = 2023 OR cuotaTotal <> '0.0000' --and cuotaTotalRect
 ORDER BY contrato, fechaFactura;
 
 GO
-
 
 

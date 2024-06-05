@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\NOTIFIACIONES_CONFIGURACION",
+    "\\NOTIFIACIONES_CONFIGURACION\\sprints47-54_00_parametros",
+    "\\NOTIFIACIONES_CONFIGURACION\\sprints47-54_01_menu",
+    "\\NOTIFIACIONES_CONFIGURACION\\sprints47-54_02_tasktypes",
+    "\\NOTIFIACIONES_CONFIGURACION\\sprints47-54_03_informes-excel",
+    "\\NOTIFIACIONES_CONFIGURACION\\sprints47-54_05_informes_rpt",
+    "\\NOTIFIACIONES_CONFIGURACION\\sprints47-54_10_inserts",
+    "\\NOTIFIACIONES_CONFIGURACION\\sprints47-54_20_Updates",
+    "\\NOTIFIACIONES_CONFIGURACION\\sprints47-54_99_CargaMasiva"
+  ],
+  "SelectedNode": "\\NOTIFIACIONES_CONFIGURACION\\sprints47-54_10_inserts\\s47-0_INSERT_ottipos.sql",
+  "PreviewInSolutionExplorer": false
+}
