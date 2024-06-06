@@ -1,4 +1,4 @@
-/*
+
 DECLARE @fechaFacturaD AS DATETIME = '20230101',
 @fechaFacturaH AS DATETIME = '20231231',
 @fechaLiquidacionD AS DATETIME = NULL,
@@ -7,16 +7,16 @@ DECLARE @fechaFacturaD AS DATETIME = '20230101',
 @periodoH AS VARCHAR(6) = NULL,
 @zonaD AS VARCHAR(4) = NULL,
 @zonaH AS VARCHAR(4) = NULL,
-@contrato AS INT,  
+@contrato AS INT = 7449,  
 @version AS INT
-
+/*
 EXEC [dbo].[Liquidaciones_Select_AVG_Detalle] 
 @fechaFacturaD, @fechaFacturaH,
 @fechaLiquidacionD, @fechaLiquidacionH, 
 @periodoD, @periodoH,
 @zonaD, @zonaH,
 @contrato, @version;
-*/
+
 
 CREATE PROCEDURE [dbo].[Liquidaciones_Select_avg_Detalle]
 @fechaFacturaD AS DATETIME = NULL,
@@ -27,10 +27,10 @@ CREATE PROCEDURE [dbo].[Liquidaciones_Select_avg_Detalle]
 @periodoH AS VARCHAR(6) = NULL,
 @zonaD AS VARCHAR(4) = NULL,
 @zonaH AS VARCHAR(4) = NULL,
-@contrato as int, 
+@contrato as int=7449, 
 @version as int 
 AS 
-
+*/
 SET NOCOUNT ON; 
 	
 DECLARE @fecFinMigracion datetime = '05/03/2019'
@@ -39,6 +39,12 @@ declare @fechaPerH as datetime = NULL
 
 set @fechaPerD = (select top 1 przfPeriodoD from perzona where przcodper = @periodoD)
 set @fechaPerH = (select top 1 przfPeriodoH from perzona where przcodper = @periodoH)
+
+
+
+
+
+
 
 ;with aux as(
 	select distinct
@@ -169,7 +175,10 @@ set @fechaPerH = (select top 1 przfPeriodoH from perzona where przcodper = @peri
 				  , fclTrfSvCod, fclTrfCod, fcltotal
 				  --Rectificada:
 				  , F0.facCod, F0.facNumero
-), agrupadas as(
+)--SELECT * FROM aux WHERE contrato=7449
+
+
+, agrupadas as(
 	select tipo, uso, facNumero, facNumeroRectif, contrato, TitDocIden, fecInicio, fecFin, diasF1, diasF2, consumoAbastecimiento, consumoEstimado, volumen, 
 			sum(habitantes) OVER (PARTITION BY facnumero) habitantes,
 			ival, ccv, reduccion, 
@@ -183,13 +192,17 @@ set @fechaPerH = (select top 1 przfPeriodoH from perzona where przcodper = @peri
 			indFact, periodo, tipoFactura, fechaFactura, servicio,			
 			RN = ROW_NUMBER() OVER(PARTITION BY facnumero ORDER BY servicio desc)
 	 from aux
-), agrupUnificadas as(
+)--SELECT * FROM agrupadas
+
+, agrupUnificadas as(
 	select 
 		tipo, uso, facNumero, facNumeroRectif, contrato, TitDocIden, fecInicio, fecFin, diasF1, diasF2, consumoAbastecimiento, consumoEstimado, volumen, habitantes, ival, ccv, reduccion, 
 		cuotaFija, CV1, CV2, CV3, CVTotal, impDisp, cuotaTotal, indFact, periodo, tipoFactura, fechaFactura
 	from agrupadas
 	where RN = 1
-), conRectificadas as(
+)--SELECT * FROM agrupUnificadas
+
+, conRectificadas as(
 	select distinct
 		a.*,
 		f.facNumero as facNumeroRectificada, f.facFecha as facFechaRectificada,
@@ -231,7 +244,8 @@ set @fechaPerH = (select top 1 przfPeriodoH from perzona where przcodper = @peri
 	group by a.contrato, a.FechaFactura, a.tipo, a.uso, a.facNumero, a.TitDocIden, a.fecInicio, a.fecFin, a.diasF1, a.diasF2, a.consumoAbastecimiento, a.consumoEstimado, a.volumen, a.habitantes, 
 			a.ival, a.ccv, a.reduccion, a.cuotaFija, a.CV1, a.CV2, a.CV3, a.CVTotal, a.impDisp, a.cuotaTotal, a.indFact, a.periodo, a.TipoFactura, a.facNumero, a.facNumeroRectif, f.facNumero, 
 			f.facFecha, f.facConsumoFactura
-), conFugas as(
+) SELECT * FROM conRectificadas
+/*, conFugas as(
 	select
 		r.*,
 		case when fcl.fclTrfSvCod is not null then 'S' else 'N' end as indFuga,		
@@ -254,8 +268,9 @@ set @fechaPerH = (select top 1 przfPeriodoH from perzona where przcodper = @peri
 
 SELECT * FROM conFugasConsumo
 --modificación para canon = 2023
-WHERE YEAR(@fechaFacturaD) = 2023 OR cuotaTotal <> '0.0000' --and cuotaTotalRectificada <> '0.0000'
-ORDER BY contrato, fechaFactura;
+WHERE (YEAR(@fechaFacturaD) = 2023 OR cuotaTotal <> '0.0000') --and cuotaTotalRectificada <> '0.0000'
+AND contrato=7449
+ORDER BY contrato--, fechaFactura;*/
 
 GO
 

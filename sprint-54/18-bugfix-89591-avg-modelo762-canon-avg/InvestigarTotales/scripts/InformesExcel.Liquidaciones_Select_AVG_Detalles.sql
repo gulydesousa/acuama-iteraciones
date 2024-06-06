@@ -78,6 +78,8 @@ AS
 	  AND DATEDIFF(DAY,FecDesde, FecHasta) <= 400;
 
 
+
+	--Este SP no funciona correctamente si lo pasas sin filtro de contratos
 	EXEC [dbo].[Liquidaciones_Select_AVG_Detalle] 
 	@fechaFacturaD, @fechaFacturaH,
 	@fechaLiquidacionD, @fechaLiquidacionH, 

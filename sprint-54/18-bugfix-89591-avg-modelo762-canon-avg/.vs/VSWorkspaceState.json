@@ -1,6 +1,10 @@
 {
   "ExpandedNodes": [
+    "",
+    "\\08-bugfix-89591-avg-modelo762-canon-avg",
+    "\\InvestigarTotales",
     "\\InvestigarTotales\\scripts"
   ],
+  "SelectedNode": "\\InvestigarTotales\\scripts\\Select_servicio20.sql",
   "PreviewInSolutionExplorer": false
 }
