@@ -18,7 +18,7 @@ EXEC [dbo].[Liquidaciones_Select_AVG_Detalle]
 @contrato, @version;
 */
 
-CREATE PROCEDURE [dbo].[Liquidaciones_Select_AVG_Detalle]
+ALTER PROCEDURE [dbo].[Liquidaciones_Select_AVG_Detalle]
 @fechaFacturaD AS DATETIME = NULL,
 @fechaFacturaH AS DATETIME = NULL,
 @fechaLiquidacionD AS DATETIME = NULL,
@@ -250,7 +250,8 @@ set @fechaPerH = (select top 1 przfPeriodoH from perzona where przcodper = @peri
 
 SELECT * FROM conFugasConsumo
 --modificación para canon = 2023
-WHERE YEAR(@fechaFacturaD) = 2023 OR cuotaTotal <> '0.0000' --and cuotaTotalRectificada <> '0.0000'
+WHERE YEAR(@fechaFacturaD) >= 2023 
+--OR cuotaTotal <> '0.0000' --and cuotaTotalRectificada <> '0.0000'
 ORDER BY contrato, fechaFactura;
 
 GO
