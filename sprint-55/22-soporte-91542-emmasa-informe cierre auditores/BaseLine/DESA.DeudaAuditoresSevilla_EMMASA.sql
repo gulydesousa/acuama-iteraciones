@@ -1,20 +1,29 @@
+USE [ACUAMA_EMMASA_DESA]
+GO
 
+/****** Object:  StoredProcedure [dbo].[Excel_ExcelConsultas.DeudaAuditoresSevilla_EMMASA]    Script Date: 17/06/2024 13:24:34 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+/*
 DECLARE @p_params NVARCHAR(MAX);
 DECLARE @p_errId_out INT;
 DECLARE @p_errMsg_out NVARCHAR(2048);
-SET @p_params= '<NodoXML><LI><FecDesde>20140601</FecDesde><FecHasta>20240531</FecHasta></LI></NodoXML>';
-/*
+SET @p_params= '<NodoXML><LI><FecDesde>20140301</FecDesde><FecHasta>20240229</FecHasta></LI></NodoXML>';
 EXEC [dbo].[Excel_ExcelConsultas.DeudaAuditoresSevilla_EMMASA]  @p_params,  @p_errId_out OUTPUT, @p_errMsg_out OUTPUT;
 SELECT @p_errMsg_out
+*/
 
-
-ALTER PROCEDURE [dbo].[Excel_ExcelConsultas.DeudaAuditoresSevilla_EMMASA]
+CREATE PROCEDURE [dbo].[Excel_ExcelConsultas.DeudaAuditoresSevilla_EMMASA]
 	@p_params NVARCHAR(MAX),
 	@p_errId_out INT OUTPUT, 
 	@p_errMsg_out NVARCHAR(2048) OUTPUT
 
 AS
-*/
+
 	--**********
 	--PARAMETROS: 
 	--[1]fecFhacDesde: fecha dede
@@ -86,12 +95,10 @@ AS
 	group by v1.ctrTitDocIden, v1.ctrTitNom
 	HAVING SUM(cblImporte) <> 0;
 
-	CREATE TABLE #ENTREGASCUENTA (NIF VARCHAR(100) collate Modern_Spanish_CI_AS, Nombre VARCHAR(200) collate  Modern_Spanish_CI_AS, Factura VARCHAR(12) collate  Modern_Spanish_CI_AS, [Fecha Factura] DATE, estado VARCHAR(2) collate  Modern_Spanish_CI_AS, [Importe PAGO] MONEY, [Importe DEVOLUCION] MONEY
-	, cobCtr INT)
+	CREATE TABLE #ENTREGASCUENTA (NIF VARCHAR(100) collate Modern_Spanish_CI_AS, Nombre VARCHAR(200) collate  Modern_Spanish_CI_AS, Factura VARCHAR(12) collate  Modern_Spanish_CI_AS, [Fecha Factura] DATE, estado VARCHAR(2) collate  Modern_Spanish_CI_AS, [Importe PAGO] MONEY, [Importe DEVOLUCION] MONEY)
 	
 	INSERT INTO #ENTREGASCUENTA
-	select v1.ctrTitDocIden AS [NIF], v1.ctrTitNom AS Nombre, NULL AS Factura, CONVERT(DATE,cobFec) AS [Fecha Factura], 'PD' AS Estado, 0 AS [Importe PAGO],  SUM(cblImporte) AS [Importe DEVOLUCION] 
-	, C.cobCtr
+	select v1.ctrTitDocIden AS [NIF], v1.ctrTitNom AS Nombre, NULL AS Factura, CONVERT(DATE,cobFec) AS [Fecha Factura], 'PD' AS Estado, 0 AS [Importe PAGO],  SUM(cblImporte) AS [Importe DEVOLUCION] 	
 	from cobros C
 	inner join coblin on cblPpag = cobPpag and cblNum = cobNum and cblScd = cobScd
 	inner join vContratoUltVersion v1 on v1.ctrcod = cobCtr
@@ -102,7 +109,7 @@ AS
 	(P.fechaH IS NULL OR C.cobFec < P.fechaH)
 	)	where 
 	cblPer = '999999'		
-	group by v1.ctrTitDocIden, v1.ctrTitNom, cobFec, C.cobCtr
+	group by v1.ctrTitDocIden, v1.ctrTitNom, cobFec
 	HAVING SUM(cblImporte) <> 0;	
 
 	--********************
@@ -780,10 +787,7 @@ AS
 	, cobEstado AS [Estado]	
 	, deuda * IIF(cobEstado IS NOT NULL AND cobEstado='PD', 0, 1) AS [Importe PAGO]
 	, deuda * IIF(cobEstado IS NOT NULL AND cobEstado='PD', -1, 0) AS [Importe DEVOLUCION]
-	, R.ID
-	, Contrato = R.facCtrCod
-	FROM #REPORT AS R
-	
+	FROM #REPORT
 	UNION ALL
 	SELECT 
 	NIF,
@@ -792,11 +796,8 @@ AS
 	[Fecha Factura],
 	estado,
 	[Importe PAGO],
-	[Importe DEVOLUCION],
-	0 AS ID,
-	Contrato = E.cobCtr
-	FROM #ENTREGASCUENTA AS E
-	ORDER BY Contrato, ID
+	[Importe DEVOLUCION]
+	FROM #ENTREGASCUENTA
 
 
 	END TRY
