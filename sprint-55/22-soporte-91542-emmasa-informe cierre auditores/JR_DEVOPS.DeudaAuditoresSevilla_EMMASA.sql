@@ -1,11 +1,11 @@
-/*
+
 DECLARE @p_params NVARCHAR(MAX);
 DECLARE @p_errId_out INT;
 DECLARE @p_errMsg_out NVARCHAR(2048);
-SET @p_params= '<NodoXML><LI><FecDesde>20140301</FecDesde><FecHasta>20240229</FecHasta></LI></NodoXML>';
+SET @p_params= '<NodoXML><LI><FecDesde>20140601</FecDesde><FecHasta>20240531</FecHasta></LI></NodoXML>';
+/*
 EXEC [dbo].[Excel_ExcelConsultas.DeudaAuditoresSevilla_EMMASA]  @p_params,  @p_errId_out OUTPUT, @p_errMsg_out OUTPUT;
 SELECT @p_errMsg_out
-*/
 
 ALTER PROCEDURE [dbo].[Excel_ExcelConsultas.DeudaAuditoresSevilla_EMMASA]
 	@p_params NVARCHAR(MAX),
@@ -13,6 +13,7 @@ ALTER PROCEDURE [dbo].[Excel_ExcelConsultas.DeudaAuditoresSevilla_EMMASA]
 	@p_errMsg_out NVARCHAR(2048) OUTPUT
 
 AS
+*/
 
 	--**********
 	--PARAMETROS: 
@@ -777,7 +778,7 @@ AS
 	, cobEstado AS [Estado]	
 	, deuda * IIF(cobEstado IS NOT NULL AND cobEstado='PD', 0, 1) AS [Importe PAGO]
 	, deuda * IIF(cobEstado IS NOT NULL AND cobEstado='PD', -1, 0) AS [Importe DEVOLUCION]
-	FROM #REPORT
+	FROM #REPORT AS R
 	UNION ALL
 	SELECT 
 	NIF,
@@ -788,6 +789,7 @@ AS
 	[Importe PAGO],
 	[Importe DEVOLUCION]
 	FROM #ENTREGASCUENTA
+	ORDER BY NIF, [Factura], [Fecha Factura]	
 
 
 	END TRY
