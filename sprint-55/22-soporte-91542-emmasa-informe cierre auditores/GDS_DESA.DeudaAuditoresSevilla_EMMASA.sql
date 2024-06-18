@@ -70,8 +70,8 @@ AS
 	DECLARE @DOMICILIACION AS INT = 0;
 	SELECT @DOMICILIACION=mpccod 
 	FROM dbo.medpc AS M WHERE M.mpcdes = 'Domiciliación bancar';
-	
-	
+
+	/*
 	select v1.ctrTitDocIden AS [NIF]
 	INTO #ENTREGAPORNIF
 	from cobros C
@@ -85,9 +85,9 @@ AS
 	cblPer = '999999'		
 	group by v1.ctrTitDocIden, v1.ctrTitNom
 	HAVING SUM(cblImporte) <> 0;
-	
-	CREATE TABLE #ENTREGASCUENTA (NIF VARCHAR(100) collate Modern_Spanish_CI_AS, Nombre VARCHAR(200) collate  Modern_Spanish_CI_AS, Factura VARCHAR(12) collate  Modern_Spanish_CI_AS, [Fecha Factura] DATE, estado VARCHAR(2) collate  Modern_Spanish_CI_AS, [Importe PAGO] MONEY, [Importe DEVOLUCION] MONEY)
 
+	CREATE TABLE #ENTREGASCUENTA (NIF VARCHAR(100) collate Modern_Spanish_CI_AS, Nombre VARCHAR(200) collate  Modern_Spanish_CI_AS, Factura VARCHAR(12) collate  Modern_Spanish_CI_AS, [Fecha Factura] DATE, estado VARCHAR(2) collate  Modern_Spanish_CI_AS, [Importe PAGO] MONEY, [Importe DEVOLUCION] MONEY)
+	
 	INSERT INTO #ENTREGASCUENTA
 	select v1.ctrTitDocIden AS [NIF], v1.ctrTitNom AS Nombre, NULL AS Factura, CONVERT(DATE,cobFec) AS [Fecha Factura], 'PD' AS Estado, 0 AS [Importe PAGO],  SUM(cblImporte) AS [Importe DEVOLUCION] 	
 	from cobros C
@@ -102,179 +102,83 @@ AS
 	cblPer = '999999'		
 	group by v1.ctrTitDocIden, v1.ctrTitNom, cobFec
 	HAVING SUM(cblImporte) <> 0;	
+	*/
 	
 
-
-	--[01] Entregas a Cuenta por NIF del titular
-	SELECT CTR.ctrcod, CTR.ctrversion
-	, CTR.ctrTitCod 
-	, CTR.ctrTitDocIden
-	, CTR.ctrTitNom
-	, C.cobNum
-	, C.cobScd
-	, C.cobPpag
-	, CL.cblLin	
-	, CL.cblImporte
-	--RN=1: Cobro mas reciente por titular
-	, RN = ROW_NUMBER() OVER (PARTITION BY CTR.ctrTitDocIden, CTR.ctrTitNom ORDER BY C.cobFec, C.cobFecReg)
-	--Totalidad de las entregas a cuenta
-	, TotalxCliente = SUM(cblImporte)OVER (PARTITION BY CTR.ctrTitDocIden, CTR.ctrTitNom)	
-	INTO #ENTREGAS_CTA
-	FROM dbo.Cobros AS  C
-	INNER JOIN dbo.coblin AS CL 
-	ON  CL.cblPpag = C.cobPpag 
-	AND CL.cblNum = C.cobNum 
-	AND CL.cblScd = C.cobScd	
-	AND CL.cblPer = '999999' --Entregas a cuenta	
-	INNER JOIN dbo.vContratoUltVersion AS CTR 
-	ON CTR.ctrcod = C.cobCtr
-	INNER JOIN @params AS P ON
-	--Cobros de entrega a cuenta creados entre las fechas
-	(P.fechaD IS NULL OR C.cobFec >= P.fechaD) AND
-	(P.fechaH IS NULL OR C.cobFec < P.fechaH);
-
-
-	--De esta tabla queremos los que tienen importe pendiente de entregas a cuentas
-	--SELECT * FROM #ENTREGAS_CTA
-	--WHERE RN=1 AND TotalxCliente<>0
-
-	--SELECT * FROM #ENTREGAPORNIF
-
-	SELECT * FROM #ENTREGAS_CTA
-	WHERE TotalxCliente<>0
-
-	SELECT * FROM #ENTREGASCUENTA
-	
-	/*
 	--**************
-	--[01]Sacamos las facturas que por fechas son las que conformarían el reporte
-	---- #FACS: Filtramos las facturas que van para el informe
-	WITH FACS AS(
+	--[00]TOTAL FACTURAS: Sacamos las facturas que por fechas son las que conformarían el reporte
+	-- #FACTOTALES
+	SELECT T.ftfFacCod, T.ftfFacPerCod, T.ftfFacCtrCod, T.ftfFacVersion, T.ftfImporte
+	INTO #FACTOTALES
+	FROM dbo.fFacturas_TotalFacturado(NULL, NULL, NULL) AS T;
+
+	DECLARE @sql NVARCHAR(MAX);
+	SET @sql = N'CREATE CLUSTERED INDEX IDX_' + REPLACE(CONVERT(NVARCHAR(50), NEWID()), '-', '') + ' ON #FACTOTALES(ftfFacCod, ftfFacPerCod, ftfFacCtrCod, ftfFacVersion)';
+	EXEC sp_executesql @sql;
+
+	--**************
+	--[01]FACTURAS: Sacamos las facturas que por fechas son las que conformarían el reporte
+	-- #FACS: Filtramos las facturas que van para el informe
 	SELECT F.facCod
 	, F.facPerCod
 	, F.facCtrCod
-	, F.facVersion
-	, F.facCtrVersion
-	, F.facClicod
-	, F.facEstado
+	, F.facVersion	
+	, F.facFecha
 	, F.facNumero
+	, F.facSerCod
+	, F.facNumeroAqua
+	--**********************
 	, F.facFechaRectif
 	, F.facNumeroRectif
 	, F.facSerieRectif
-	, CAST(NULL AS MONEY) AS facImporteRectif
-	, F.facFechaVtoOrig
-	, F.facFechaVto
-	, F.facSerCod
-	, F.facFecha
-	, F.facLecAntFec
-	, F.facLecActFec
-	, F.facNumeroAqua
-	, CAST(NULL AS MONEY) AS facTotal
-	, CAST(NULL AS INT) AS facRfsCodigo
-	, C.ctrUsoCod
-	, C.ctrGenAlb
-	, '' AS facEstadoEmmasa
+	--**********************
+	, facTotal = ISNULL(FT.ftfImporte, 0)
+	, facImporteRectif =  CAST(NULL AS MONEY)
+	--**********************
+	, facRfsCodigo = CAST(NULL AS INT)
 	--Los Efectos Pendientes no van por versión de factura así que...
 	--Para saber cual es la última version de la factura y asociar a ella los efectos pendientes
-	, ROW_NUMBER() OVER (PARTITION BY F.facCod, F.facPerCod, F.facCtrCod ORDER BY F.facVersion DESC) AS RN
+	--RN_FAC=1: Ultima vesión de la factura
+	, RN_FAC = ROW_NUMBER() OVER (PARTITION BY F.facCod, F.facPerCod, F.facCtrCod ORDER BY F.facVersion DESC)
+	--**********************
+	INTO #FACS
 	FROM dbo.facturas AS F
-	INNER JOIN dbo.contratos AS C
-	ON C.ctrcod = F.facCtrCod 
-	AND C.ctrversion = F.facCtrVersion
-	AND F.facNumero IS NOT NULL --Se excluyen las prefacturas
-	AND F.facEstado NOT IN (4,5)		--Se excluyen las (4) AGRUPADAS NI (5) TRASPASADAS. No es deuda 	
-	LEFT JOIN dbo.perzona AS PZ
-	ON PZ.przcodper = F.facPerCod
-	AND PZ.przcodzon = F.facZonCod
+	LEFT JOIN #FACTOTALES AS FT
+	ON  F.facCod = FT.ftfFacCod
+	AND F.facPerCod = FT.ftfFacPerCod
+	AND F.facCtrCod = FT.ftfFacCtrCod
+	AND F.facVersion = FT.ftfFacVersion	
+	--Facturas creadas dentro del rango de fechas
 	INNER JOIN @params AS P
-	ON	
-	(--Facturas creadas dentro del rango de fechas
-	(P.fechaD IS NULL OR F.facFecha >= P.fechaD) AND
-	(P.fechaH IS NULL OR F.facFecha < P.fechaH)
-	)
-	)
+	ON  (P.fechaD IS NULL OR F.facFecha >= P.fechaD) 
+	AND (P.fechaH IS NULL OR F.facFecha < P.fechaH)
+	WHERE F.facNumero IS NOT NULL	--Se excluyen las prefacturas
+	AND F.facEstado NOT IN (4,5);	--Se excluyen las (4) AGRUPADAS NI (5) TRASPASADAS. No es deuda 	
 
-	SELECT * INTO #FACS 
-	FROM FACS;
-
-	--**************
-	--[02]Totalizamos las lineas de las facturas con un update en la tabla #FACS
-	--SYR-198757. Descuadraba por la forma de calculo de lo facturado. 
-	---- #FACS.facTotal: Totalizamos el importe de la factura
-	WITH FACT AS (
-	--Recuperamos para todas las facturas las lineas no liquidadas 
-	SELECT F.facCod 
-	, F.facPerCod 
-	, F.facCtrCod
-	, F.facVersion 
-	--, ROUND(SUM(FL.fcltotal), 2) AS [facTotal]
-	, FL.ftfImporte as facTotal
-	FROM #FACS AS F
-	INNER JOIN fFacturas_TotalFacturado(NULL, NULL, NULL) AS FL
-	ON F.facCod = FL.ftfFacCod
-	AND F.facPerCod = FL.ftfFacPerCod
-	AND F.facCtrCod = FL.ftfFacCtrCod
-	AND F.facVersion = FL.ftfFacVersion	)
-	--	INNER JOIN dbo.faclin AS FL	
-	--ON F.facCod = FL.fclFacCod
-	--AND F.facPerCod = FL.fclFacPerCod
-	--AND F.facCtrCod = FL.fclFacCtrCod
-	--AND F.facVersion = FL.fclFacVersion
-	--AND FL.fclFecLiq IS NULL
-	--GROUP BY F.facCod, F.facPerCod, F.facCtrCod, F.facVersion )
-
-	--Total FACTURAS
-	UPDATE F
-	SET F.facTotal  = ISNULL(FT.facTotal, 0)
-	FROM #FACS AS F
-	INNER JOIN FACT AS FT
-	ON F.facCod = FT.facCod
-	AND F.facPerCod = FT.facPerCod
-	AND F.facCtrCod = FT.facCtrCod
-	AND F.facVersion = FT.facVersion;
-
-	--**************
-	--[03]Para saber las "Anuladas", tenemos que calcular el importe de las facturas rectificativas
-	--Lo setearemos con un UPDATE 
-	---- #FACS.facImporteRectif: Importe de la factura rectificativa
-	WITH RECTIF AS(
-	SELECT FF.facCod
-	, FF.facCtrCod
-	, FF.facPerCod
-	, FF.facVersion
-	, R.facNumero AS facNumeroRectif 
-	, SUM(FLR.fcltotal) AS facImporteRectif
+	SET @sql = N'CREATE CLUSTERED INDEX IDX_' + REPLACE(CONVERT(NVARCHAR(50), NEWID()), '-', '') + ' ON #FACS(facCod, facPerCod, facCtrCod, facVersion)';
+	EXEC sp_executesql @sql;	
+	
+	
+	--**********************
+	--[02]RECTIFICATIVAS: Para saber las "Anuladas", tenemos que calcular el importe de las facturas rectificativas
+	-- #RECTIF: Importe de la factura rectificativa
+	UPDATE FF SET FF.facImporteRectif = T.ftfImporte
 	FROM #FACS AS FF
 	INNER JOIN dbo.facturas AS R
-	ON FF.facFechaRectif IS NOT NULL
+	ON  FF.facFechaRectif IS NOT NULL
 	AND FF.facCod = R.facCod
 	AND FF.facPerCod = R.facPerCod
 	AND FF.facCtrCod = R.facCtrCod  
 	AND FF.facFechaRectif = R.facFecha 
 	AND FF.facNumeroRectif = R.facNumero 
 	AND FF.facSerieRectif = R.facSerCod
-	INNER JOIN dbo.faclin AS FLR
-	ON R.facCod = FLR.fclFacCod
-	AND R.facCtrCod = FLR.fclFacCtrCod
-	AND R.facPerCod = FLR.fclFacPerCod
-	AND R.facVersion = FLR.fclFacVersion
-	AND FLR.fclFecLiq IS NULL
-	GROUP BY FF.facCod
-	, FF.facCtrCod
-	, FF.facPerCod
-	, FF.facVersion
-	, R.facNumero)
+	INNER JOIN #FACTOTALES AS T
+	ON T.ftfFacCod = R.facCod
+	AND T.ftfFacPerCod = R.facPerCod
+	AND T.ftfFacCtrCod = R.facCtrCod
+	AND T.ftfFacVersion = T.ftfFacVersion;
 	
-	--Total RECTIFICADA
-	UPDATE F
-	SET F.facImporteRectif  = ISNULL(FT.facImporteRectif, 0)
-	FROM #FACS AS F
-	INNER JOIN RECTIF AS FT
-	ON F.facCod = FT.facCod
-	AND F.facPerCod = FT.facPerCod
-	AND F.facCtrCod = FT.facCtrCod
-	AND F.facVersion = FT.facVersion;
-
+	
 	--**************
 	--[04]Para saber las que están en estado "Rechazada". Lo setearemos con un UPDATE 
 	---- #FACS.facRfsCodigo: Rechazadas
@@ -286,12 +190,12 @@ AS
 	, MAX(R.rfsCodigo) AS rfsCodigo
 	FROM #FACS AS F
 	INNER JOIN dbo.refacturacionesLineas AS RL
-	ON RL.rflFacCod = F.facCod
+	ON  RL.rflFacCod = F.facCod
 	AND RL.rflFacPerCod = F.facPerCod
 	AND RL.rflFacCtrCod = F.facCtrCod
 	AND RL.rflFacVersion = F.facVersion
 	INNER JOIN dbo.refacturaciones AS R
-	ON R.rfsCodigo = RL.rflFacCod
+	ON  R.rfsCodigo = RL.rflFacCod
 	AND R.rfsFechaGeneracion IS NULL
 	GROUP BY F.facCod, F.facPerCod, F.facCtrCod, F.facVersion )
 
@@ -300,11 +204,14 @@ AS
 	SET F.facRfsCodigo  = FT.rfsCodigo
 	FROM #FACS AS F
 	INNER JOIN RECHAZADAS AS FT
-	ON F.facCod = FT.facCod
+	ON  F.facCod = FT.facCod
 	AND F.facPerCod = FT.facPerCod
 	AND F.facCtrCod = FT.facCtrCod
 	AND F.facVersion = FT.facVersion;
-		
+
+
+
+	/*	
 	--**************
 	--[05]Calculamos todos los estados de las facturas y setearemos con un UPDATE 
 	---- #FACS.facEstadoEmmasa: Estado según EMMASA
@@ -815,7 +722,7 @@ AS
 	, cobEstado AS [Estado]	
 	, deuda * IIF(cobEstado IS NOT NULL AND cobEstado='PD', 0, 1) AS [Importe PAGO]
 	, deuda * IIF(cobEstado IS NOT NULL AND cobEstado='PD', -1, 0) AS [Importe DEVOLUCION]
-	FROM #REPORT
+	FROM #REPORT AS R
 	UNION ALL
 	SELECT 
 	NIF,
@@ -826,8 +733,7 @@ AS
 	[Importe PAGO],
 	[Importe DEVOLUCION]
 	FROM #ENTREGASCUENTA
-
-	ORDER BY ctrTitDocIden, facNumeroAqua, facFecha
+	ORDER BY NIF, [Factura], [Fecha Factura]	
 	*/
 
 	END TRY
@@ -838,8 +744,12 @@ AS
 	END CATCH
 
 
-	IF OBJECT_ID('tempdb.dbo.#FACS', 'U') IS NOT NULL  
-	DROP TABLE dbo.#FACS;
+	IF OBJECT_ID('tempdb.dbo.#FACS', 'U') IS NOT NULL DROP TABLE dbo.#FACS;
+	IF OBJECT_ID('tempdb.dbo.#FACTOTALES', 'U') IS NOT NULL DROP TABLE dbo.#FACTOTALES;
+	IF OBJECT_ID('tempdb.dbo.#RECTIF', 'U') IS NOT NULL  DROP TABLE dbo.#RECTIF;
+
+
+
 	
 	IF OBJECT_ID('tempdb.dbo.#COBROS', 'U') IS NOT NULL  
 	DROP TABLE dbo.#COBROS;
@@ -868,9 +778,9 @@ AS
 
 	IF OBJECT_ID('tempdb.dbo.#ENTREGASCUENTA', 'U') IS NOT NULL  
 	DROP TABLE dbo.#ENTREGASCUENTA;
+	
 
 
-	DROP TABLE IF EXISTS #ENTREGAS_CTA;
 GO
 
 
