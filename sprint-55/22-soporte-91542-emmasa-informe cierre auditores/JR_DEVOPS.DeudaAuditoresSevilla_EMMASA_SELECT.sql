@@ -1,19 +1,20 @@
+
 DECLARE @p_params NVARCHAR(MAX);
 DECLARE @p_errId_out INT;
 DECLARE @p_errMsg_out NVARCHAR(2048);
-SET @p_params= '<NodoXML><LI><FecDesde>20140106</FecDesde><FecHasta>20240529</FecHasta></LI></NodoXML>';
+SET @p_params= '<NodoXML><LI><FecDesde>20140601</FecDesde><FecHasta>20240531</FecHasta></LI></NodoXML>';
 /*
 EXEC [dbo].[Excel_ExcelConsultas.DeudaAuditoresSevilla_EMMASA]  @p_params,  @p_errId_out OUTPUT, @p_errMsg_out OUTPUT;
 SELECT @p_errMsg_out
 
-
-CREATE PROCEDURE [dbo].[Excel_ExcelConsultas.DeudaAuditoresSevilla_EMMASA]
+ALTER PROCEDURE [dbo].[Excel_ExcelConsultas.DeudaAuditoresSevilla_EMMASA]
 	@p_params NVARCHAR(MAX),
 	@p_errId_out INT OUTPUT, 
 	@p_errMsg_out NVARCHAR(2048) OUTPUT
 
 AS
 */
+
 	--**********
 	--PARAMETROS: 
 	--[1]fecFhacDesde: fecha dede
@@ -71,7 +72,6 @@ AS
 	SELECT @DOMICILIACION=mpccod 
 	FROM dbo.medpc AS M WHERE M.mpcdes = 'Domiciliación bancar';
 
-	/*
 	select v1.ctrTitDocIden AS [NIF]
 	INTO #ENTREGAPORNIF
 	from cobros C
@@ -102,90 +102,147 @@ AS
 	cblPer = '999999'		
 	group by v1.ctrTitDocIden, v1.ctrTitNom, cobFec
 	HAVING SUM(cblImporte) <> 0;	
-	*/
-	
-	DECLARE @sql NVARCHAR(MAX);
-	--**************
-	--[00]TOTAL FACTURAS: Sacamos las facturas que por fechas son las que conformarían el reporte
-	-- #FACTOTALES
-	SELECT T.ftfFacCod, T.ftfFacPerCod, T.ftfFacCtrCod, T.ftfFacVersion, T.ftfImporte
-	INTO #FACTOTALES
-	FROM dbo.fFacturas_TotalFacturado(NULL, NULL, NULL) AS T;
 
-	SET @sql = N'CREATE CLUSTERED INDEX IDX_' + REPLACE(CONVERT(NVARCHAR(50), NEWID()), '-', '') + ' ON #FACTOTALES(ftfFacCod, ftfFacPerCod, ftfFacCtrCod, ftfFacVersion)';
-	EXEC sp_executesql @sql;
+	--********************
+	--DataTable[2]:  Nombre de Grupos 
+	/*SELECT * 
+	FROM (VALUES('Recibos: Cobros y Efectos Pendientes')) 
+	AS DataTables(Grupo);*/
 
 	--**************
-	--[01]FACTURAS: Sacamos las facturas que por fechas son las que conformarían el reporte
-	-- #FACS: Filtramos las facturas que van para el informe
+	--[01]Sacamos las facturas que por fechas son las que conformarían el reporte
+	---- #FACS: Filtramos las facturas que van para el informe
+	WITH FACS AS(
 	SELECT F.facCod
 	, F.facPerCod
 	, F.facCtrCod
-	, F.facVersion	
-	, F.facFecha
-	, F.facNumero
-	, F.facSerCod
-	, F.facNumeroAqua
+	, F.facVersion
+	, F.facCtrVersion
+	, F.facClicod
 	, F.facEstado
-	--**********************
+	, F.facNumero
 	, F.facFechaRectif
 	, F.facNumeroRectif
 	, F.facSerieRectif
-	--**********************
-	, facTotal = ISNULL(FT.ftfImporte, 0)
-	, facImporteRectif =  CAST(NULL AS MONEY)
-	--**********************
-	, facRfsCodigo = CAST(NULL AS INT)
+	, CAST(NULL AS MONEY) AS facImporteRectif
+	, F.facFechaVtoOrig
+	, F.facFechaVto
+	, F.facSerCod
+	, F.facFecha
+	, F.facLecAntFec
+	, F.facLecActFec
+	, F.facNumeroAqua
+	, CAST(NULL AS MONEY) AS facTotal
+	, CAST(NULL AS INT) AS facRfsCodigo
+	, C.ctrUsoCod
+	, C.ctrGenAlb
 	, '' AS facEstadoEmmasa
 	--Los Efectos Pendientes no van por versión de factura así que...
 	--Para saber cual es la última version de la factura y asociar a ella los efectos pendientes
-	--RN_FAC=1: Ultima vesión de la factura
-	, RN_FAC = ROW_NUMBER() OVER (PARTITION BY F.facCod, F.facPerCod, F.facCtrCod ORDER BY F.facVersion DESC)
-	--**********************
-	INTO #FACS
+	, ROW_NUMBER() OVER (PARTITION BY F.facCod, F.facPerCod, F.facCtrCod ORDER BY F.facVersion DESC) AS RN
 	FROM dbo.facturas AS F
-	LEFT JOIN #FACTOTALES AS FT
-	ON  F.facCod = FT.ftfFacCod
-	AND F.facPerCod = FT.ftfFacPerCod
-	AND F.facCtrCod = FT.ftfFacCtrCod
-	AND F.facVersion = FT.ftfFacVersion	
-	--Facturas creadas dentro del rango de fechas
+	INNER JOIN dbo.contratos AS C
+	ON C.ctrcod = F.facCtrCod 
+	AND C.ctrversion = F.facCtrVersion
+	AND F.facNumero IS NOT NULL --Se excluyen las prefacturas
+	AND F.facEstado NOT IN (4,5)		--Se excluyen las (4) AGRUPADAS NI (5) TRASPASADAS. No es deuda 	
+	LEFT JOIN dbo.perzona AS PZ
+	ON PZ.przcodper = F.facPerCod
+	AND PZ.przcodzon = F.facZonCod
 	INNER JOIN @params AS P
-	ON  (P.fechaD IS NULL OR F.facFecha >= P.fechaD) 
-	AND (P.fechaH IS NULL OR F.facFecha < P.fechaH)
+	ON	
+	(--Facturas creadas dentro del rango de fechas
+	(P.fechaD IS NULL OR F.facFecha >= P.fechaD) AND
+	(P.fechaH IS NULL OR F.facFecha < P.fechaH)
+	)
 
 	AND facCtrCod=110139360
-	WHERE F.facNumero IS NOT NULL	--Se excluyen las prefacturas
-	AND F.facEstado NOT IN (4,5);	--Se excluyen las (4) AGRUPADAS NI (5) TRASPASADAS. No es deuda 	
+	)
 
-	SET @sql = N'CREATE CLUSTERED INDEX IDX_' + REPLACE(CONVERT(NVARCHAR(50), NEWID()), '-', '') + ' ON #FACS(facCod, facPerCod, facCtrCod, facVersion)';
-	EXEC sp_executesql @sql;	
-	
-	
-	--**********************
-	--[02]RECTIFICATIVAS: Para saber las "Anuladas", tenemos que calcular el importe de las facturas rectificativas
-	-- #FACS.facImporteRectif: Importe de la factura rectificativa
-	UPDATE FF SET FF.facImporteRectif = T.ftfImporte
+	SELECT * INTO #FACS 
+	FROM FACS;
+
+	--**************
+	--[02]Totalizamos las lineas de las facturas con un update en la tabla #FACS
+	--SYR-198757. Descuadraba por la forma de calculo de lo facturado. 
+	---- #FACS.facTotal: Totalizamos el importe de la factura
+	WITH FACT AS (
+	--Recuperamos para todas las facturas las lineas no liquidadas 
+	SELECT F.facCod 
+	, F.facPerCod 
+	, F.facCtrCod
+	, F.facVersion 
+	--, ROUND(SUM(FL.fcltotal), 2) AS [facTotal]
+	, FL.ftfImporte as facTotal
+	FROM #FACS AS F
+	INNER JOIN fFacturas_TotalFacturado(NULL, NULL, NULL) AS FL
+	ON F.facCod = FL.ftfFacCod
+	AND F.facPerCod = FL.ftfFacPerCod
+	AND F.facCtrCod = FL.ftfFacCtrCod
+	AND F.facVersion = FL.ftfFacVersion	)
+	--	INNER JOIN dbo.faclin AS FL	
+	--ON F.facCod = FL.fclFacCod
+	--AND F.facPerCod = FL.fclFacPerCod
+	--AND F.facCtrCod = FL.fclFacCtrCod
+	--AND F.facVersion = FL.fclFacVersion
+	--AND FL.fclFecLiq IS NULL
+	--GROUP BY F.facCod, F.facPerCod, F.facCtrCod, F.facVersion )
+
+	--Total FACTURAS
+	UPDATE F
+	SET F.facTotal  = ISNULL(FT.facTotal, 0)
+	FROM #FACS AS F
+	INNER JOIN FACT AS FT
+	ON F.facCod = FT.facCod
+	AND F.facPerCod = FT.facPerCod
+	AND F.facCtrCod = FT.facCtrCod
+	AND F.facVersion = FT.facVersion;
+
+	--**************
+	--[03]Para saber las "Anuladas", tenemos que calcular el importe de las facturas rectificativas
+	--Lo setearemos con un UPDATE 
+	---- #FACS.facImporteRectif: Importe de la factura rectificativa
+	WITH RECTIF AS(
+	SELECT FF.facCod
+	, FF.facCtrCod
+	, FF.facPerCod
+	, FF.facVersion
+	, R.facNumero AS facNumeroRectif 
+	, SUM(FLR.fcltotal) AS facImporteRectif
 	FROM #FACS AS FF
 	INNER JOIN dbo.facturas AS R
-	ON  FF.facFechaRectif IS NOT NULL
+	ON FF.facFechaRectif IS NOT NULL
 	AND FF.facCod = R.facCod
 	AND FF.facPerCod = R.facPerCod
 	AND FF.facCtrCod = R.facCtrCod  
 	AND FF.facFechaRectif = R.facFecha 
 	AND FF.facNumeroRectif = R.facNumero 
 	AND FF.facSerieRectif = R.facSerCod
-	INNER JOIN #FACTOTALES AS T
-	ON T.ftfFacCod = R.facCod
-	AND T.ftfFacPerCod = R.facPerCod
-	AND T.ftfFacCtrCod = R.facCtrCod
-	AND T.ftfFacVersion = T.ftfFacVersion;
+	INNER JOIN dbo.faclin AS FLR
+	ON R.facCod = FLR.fclFacCod
+	AND R.facCtrCod = FLR.fclFacCtrCod
+	AND R.facPerCod = FLR.fclFacPerCod
+	AND R.facVersion = FLR.fclFacVersion
+	AND FLR.fclFecLiq IS NULL
+	GROUP BY FF.facCod
+	, FF.facCtrCod
+	, FF.facPerCod
+	, FF.facVersion
+	, R.facNumero)
 	
-	
+	--Total RECTIFICADA
+	UPDATE F
+	SET F.facImporteRectif  = ISNULL(FT.facImporteRectif, 0)
+	FROM #FACS AS F
+	INNER JOIN RECTIF AS FT
+	ON F.facCod = FT.facCod
+	AND F.facPerCod = FT.facPerCod
+	AND F.facCtrCod = FT.facCtrCod
+	AND F.facVersion = FT.facVersion;
+
 	--**************
 	--[04]Para saber las que están en estado "Rechazada". Lo setearemos con un UPDATE 
-	-- #FACS.facRfsCodigo: Rechazadas
-	-- #FACS.facEstadoEmmasa: Estados de Emmasa
+	---- #FACS.facRfsCodigo: Rechazadas
 	WITH RECHAZADAS AS (
 	SELECT F.facCod
 	, F.facPerCod
@@ -194,46 +251,69 @@ AS
 	, MAX(R.rfsCodigo) AS rfsCodigo
 	FROM #FACS AS F
 	INNER JOIN dbo.refacturacionesLineas AS RL
-	ON  RL.rflFacCod = F.facCod
+	ON RL.rflFacCod = F.facCod
 	AND RL.rflFacPerCod = F.facPerCod
 	AND RL.rflFacCtrCod = F.facCtrCod
 	AND RL.rflFacVersion = F.facVersion
 	INNER JOIN dbo.refacturaciones AS R
-	ON  R.rfsCodigo = RL.rflFacCod
+	ON R.rfsCodigo = RL.rflFacCod
 	AND R.rfsFechaGeneracion IS NULL
-	GROUP BY F.facCod, F.facPerCod, F.facCtrCod, F.facVersion)
+	GROUP BY F.facCod, F.facPerCod, F.facCtrCod, F.facVersion )
 
 	--ID rechazada
 	UPDATE F
-	SET F.facRfsCodigo  = FT.rfsCodigo,
-		F.facEstadoEmmasa = CASE
-							--V	Retenida pendiente de Validación / NO APLICA	
-							--A	Retenida pendiente de Aprobación / NO APLICA	
-							--E: Rechazada pendiente de Expediente / Facturas incluidas en una propuesta de refacturación
-							WHEN FT.rfsCodigo IS NOT NULL THEN 'E'
-							--N: Anulada/Facturas anuladas
-							WHEN F.facNumeroRectif IS NOT NULL AND F.facImporteRectif = 0 THEN  'N'
-							--R	Rechazada pendiente de Revisión	
-							WHEN F.facNumeroRectif IS NOT NULL AND F.facImporteRectif <> 0 THEN  'R'
-							--B: Albarán/Facturas con estado 7
-							WHEN (F.facEstado IS NOT NULL AND F.facEstado = 7) THEN 'B' 	
-							--G: Generada/ FACTURA REAL (prefactura?)
-							WHEN F.facNumero IS NULL THEN 'G'
-							--F: Facturada/Facturas / FACTURA REAL
-							WHEN (F.facNumero IS NOT NULL) THEN 'F' 
-							ELSE '' END 
+	SET F.facRfsCodigo  = FT.rfsCodigo
 	FROM #FACS AS F
-	LEFT JOIN RECHAZADAS AS FT
-	ON  F.facCod = FT.facCod
+	INNER JOIN RECHAZADAS AS FT
+	ON F.facCod = FT.facCod
 	AND F.facPerCod = FT.facPerCod
 	AND F.facCtrCod = FT.facCtrCod
 	AND F.facVersion = FT.facVersion;
-
-
-
+		
 	--**************
-	--[05]Borramos de la tabla #FACS las que no nos interesan, por su estado, para sacar el informe
-	-- #FACS: Excluimos facturas que no se toman en cuenta para el informe
+	--[05]Calculamos todos los estados de las facturas y setearemos con un UPDATE 
+	---- #FACS.facEstadoEmmasa: Estado según EMMASA
+	WITH ESTADO AS(	
+	--Filtramos las facturas para el informe y buscamos su estado
+	SELECT F.facCod
+	, F.facPerCod
+	, F.facCtrCod
+	, F.facVersion
+	--******************
+	--ESTADO FACTURA
+	--*****************
+	, CASE 
+	--V	Retenida pendiente de Validación / NO APLICA	
+	--A	Retenida pendiente de Aprobación / NO APLICA	
+	--R	Rechazada pendiente de Revisión/ NO APLICA	
+	--********
+	--E: Rechazada pendiente de Expediente / Facturas incluidas en una propuesta de refacturación
+	WHEN F.facRfsCodigo IS NOT NULL THEN 'E'
+	--N: Anulada/Facturas anuladas
+	WHEN F.facNumeroRectif IS NOT NULL THEN IIF(F.facImporteRectif = 0, 'N', 'R')
+	--B: Albarán/Facturas con estado 7
+	WHEN (F.facEstado IS NOT NULL AND F.facEstado = 7) THEN 'B' 
+	--G: Generada/ FACTURA REAL (prefactura?)
+	WHEN F.facNumero IS NULL THEN 'G'
+	--F: Facturada/Facturas / FACTURA REAL
+	WHEN (F.facNumero IS NOT NULL) THEN 'F' 
+	ELSE '' END 
+	AS facEstadoEmmasa
+	FROM #FACS AS F)
+
+	--Estado EMMASA
+	UPDATE F
+	SET F.facEstadoEmmasa  = FT.facEstadoEmmasa
+	FROM #FACS AS F
+	INNER JOIN ESTADO AS FT
+	ON F.facCod = FT.facCod
+	AND F.facPerCod = FT.facPerCod
+	AND F.facCtrCod = FT.facCtrCod
+	AND F.facVersion = FT.facVersion;
+	
+	--**************
+	--[06]Borramos de la tabla #FACS las que no nos interesan, por su estado, para sacar el informe
+	---- #FACS: Excluimos facturas que no se toman en cuenta para el informe
 	DELETE FROM F
 	FROM #FACS AS F
 	WHERE F.facTotal IS NULL 
@@ -244,11 +324,6 @@ AS
 
 
 	SELECT * FROM #FACS;
-
-	/*	
-	
-	
-	
 	
 	--**************
 	--[11]Totalizamos los cobros por FACTURA
@@ -720,7 +795,7 @@ AS
 	[Importe DEVOLUCION]
 	FROM #ENTREGASCUENTA
 	ORDER BY NIF, [Factura], [Fecha Factura]	
-	*/
+
 
 	END TRY
 	
@@ -730,11 +805,8 @@ AS
 	END CATCH
 
 
-	IF OBJECT_ID('tempdb.dbo.#FACS', 'U') IS NOT NULL DROP TABLE dbo.#FACS;
-	IF OBJECT_ID('tempdb.dbo.#FACTOTALES', 'U') IS NOT NULL DROP TABLE dbo.#FACTOTALES;
-
-
-
+	IF OBJECT_ID('tempdb.dbo.#FACS', 'U') IS NOT NULL  
+	DROP TABLE dbo.#FACS;
 	
 	IF OBJECT_ID('tempdb.dbo.#COBROS', 'U') IS NOT NULL  
 	DROP TABLE dbo.#COBROS;
@@ -763,9 +835,6 @@ AS
 
 	IF OBJECT_ID('tempdb.dbo.#ENTREGASCUENTA', 'U') IS NOT NULL  
 	DROP TABLE dbo.#ENTREGASCUENTA;
-	
-
-
 GO
 
 
