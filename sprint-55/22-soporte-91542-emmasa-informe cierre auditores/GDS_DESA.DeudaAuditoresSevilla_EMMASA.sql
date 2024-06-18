@@ -104,7 +104,7 @@ AS
 	HAVING SUM(cblImporte) <> 0;	
 	*/
 	
-
+	DECLARE @sql NVARCHAR(MAX);
 	--**************
 	--[00]TOTAL FACTURAS: Sacamos las facturas que por fechas son las que conformarían el reporte
 	-- #FACTOTALES
@@ -112,7 +112,6 @@ AS
 	INTO #FACTOTALES
 	FROM dbo.fFacturas_TotalFacturado(NULL, NULL, NULL) AS T;
 
-	DECLARE @sql NVARCHAR(MAX);
 	SET @sql = N'CREATE CLUSTERED INDEX IDX_' + REPLACE(CONVERT(NVARCHAR(50), NEWID()), '-', '') + ' ON #FACTOTALES(ftfFacCod, ftfFacPerCod, ftfFacCtrCod, ftfFacVersion)';
 	EXEC sp_executesql @sql;
 
@@ -127,6 +126,7 @@ AS
 	, F.facNumero
 	, F.facSerCod
 	, F.facNumeroAqua
+	, F.facEstado
 	--**********************
 	, F.facFechaRectif
 	, F.facNumeroRectif
@@ -136,6 +136,7 @@ AS
 	, facImporteRectif =  CAST(NULL AS MONEY)
 	--**********************
 	, facRfsCodigo = CAST(NULL AS INT)
+	, '' AS facEstadoEmmasa
 	--Los Efectos Pendientes no van por versión de factura así que...
 	--Para saber cual es la última version de la factura y asociar a ella los efectos pendientes
 	--RN_FAC=1: Ultima vesión de la factura
@@ -197,13 +198,29 @@ AS
 	INNER JOIN dbo.refacturaciones AS R
 	ON  R.rfsCodigo = RL.rflFacCod
 	AND R.rfsFechaGeneracion IS NULL
-	GROUP BY F.facCod, F.facPerCod, F.facCtrCod, F.facVersion )
+	GROUP BY F.facCod, F.facPerCod, F.facCtrCod, F.facVersion)
 
 	--ID rechazada
 	UPDATE F
-	SET F.facRfsCodigo  = FT.rfsCodigo
+	SET F.facRfsCodigo  = FT.rfsCodigo,
+		F.facEstadoEmmasa = CASE
+							--V	Retenida pendiente de Validación / NO APLICA	
+							--A	Retenida pendiente de Aprobación / NO APLICA	
+							--E: Rechazada pendiente de Expediente / Facturas incluidas en una propuesta de refacturación
+							WHEN FT.rfsCodigo IS NOT NULL THEN 'E'
+							--N: Anulada/Facturas anuladas
+							WHEN F.facNumeroRectif IS NOT NULL AND F.facImporteRectif = 0 THEN  'N'
+							--R	Rechazada pendiente de Revisión	
+							WHEN F.facNumeroRectif IS NOT NULL AND F.facImporteRectif <> 0 THEN  'R'
+							--B: Albarán/Facturas con estado 7
+							WHEN (F.facEstado IS NOT NULL AND F.facEstado = 7) THEN 'B' 	
+							--G: Generada/ FACTURA REAL (prefactura?)
+							WHEN F.facNumero IS NULL THEN 'G'
+							--F: Facturada/Facturas / FACTURA REAL
+							WHEN (F.facNumero IS NOT NULL) THEN 'F' 
+							ELSE '' END 
 	FROM #FACS AS F
-	INNER JOIN RECHAZADAS AS FT
+	LEFT JOIN RECHAZADAS AS FT
 	ON  F.facCod = FT.facCod
 	AND F.facPerCod = FT.facPerCod
 	AND F.facCtrCod = FT.facCtrCod
