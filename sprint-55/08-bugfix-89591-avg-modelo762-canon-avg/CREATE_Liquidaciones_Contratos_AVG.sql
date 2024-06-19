@@ -319,10 +319,10 @@ BEGIN TRY
 	--*********************************************************
 	--[99]SALIDA
 	--*********************************************************
-	SELECT C.ctrcod
-	, C.ctrversion
+	SELECT [contrato] = C.ctrcod
+	, [ctrVersion] = C.ctrversion
 	--Los datos los traemos de la ultima vesion por combinación CT (Contrato, Titular)
-	, CT.ctrTitDocIden
+	, [Titular] = CT.ctrTitDocIden
 	, [tipo]= 'C'
 	, [tipoIdent] = CASE WHEN CT.ctrTitTipDoc IN ('0','1') THEN 'F'
 						WHEN CT.ctrTitTipDoc IN ('2','4') THEN 'E'
