@@ -7,7 +7,8 @@ DECLARE @fechaFacturaD AS DATETIME = '20230201',
 @periodoH AS VARCHAR(6) = NULL,
 @zonaD AS VARCHAR(4) = NULL,
 @zonaH AS VARCHAR(4) = NULL
-, @ctrcod AS INT = 415
+, @ctrcod AS INT = 32662
+
 
 EXEC dbo.Liquidaciones_Contratos_AVG @fechaFacturaD, @fechaFacturaH
 , @fechaLiquidacionD, @fechaLiquidacionH
@@ -28,8 +29,8 @@ EXEC Liquidaciones_RegistrosContratos_AVG_nuevo @fechaFacturaD, @fechaFacturaH
 , @periodoD, @periodoH
 , @zonaD, @zonaH
 , @ctrcod;
-*/
 
+*/
 ALTER PROCEDURE dbo.Liquidaciones_Contratos_AVG
 @fechaFacturaD AS DATETIME = NULL,
 @fechaFacturaH AS DATETIME = NULL,
@@ -245,7 +246,11 @@ BEGIN TRY
 	, F.Anterior_facVersion, F.Anterior_ServiciosCanon 
 
 	--NumFacActivas: Facturas sin fecha de rectificacion por version de contrato
-	, NumFacActivas = SUM(IIF(facFechaRectif IS NULL, 1, 0)) OVER (PARTITION BY F.facCtrCod, F.facCtrVersion)
+	--...o rectificadas fuera del plazo en consulta
+	, NumFacActivas =SUM(IIF(facFechaRectif IS NULL OR (
+							 (@facFechaD IS NULL OR facFechaRectif> @facFechaD) AND 
+							 (@facFechaD IS NULL OR facFechaRectif> @facFechaD)), 1, 0)) 
+					  OVER (PARTITION BY F.facCtrCod, F.facCtrVersion)
 
 	--NumFacRectificativas: Facturas que rectifican a una factura que tenía el canon
 	, NumFacRectificativas = SUM(Anterior_ServiciosCanon) OVER (PARTITION BY F.facCtrCod, F.facCtrVersion)
