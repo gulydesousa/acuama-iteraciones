@@ -7,7 +7,7 @@ DECLARE @fechaFacturaD AS DATETIME = '20230201',
 @periodoH AS VARCHAR(6) = NULL,
 @zonaD AS VARCHAR(4) = NULL,
 @zonaH AS VARCHAR(4) = NULL
-, @ctrcod AS INT = 1908
+, @ctrcod AS INT = 415
 
 EXEC dbo.Liquidaciones_Contratos_AVG @fechaFacturaD, @fechaFacturaH
 , @fechaLiquidacionD, @fechaLiquidacionH
@@ -22,10 +22,6 @@ EXEC Liquidaciones_RegistrosContratos_AVG_old @fechaFacturaD, @fechaFacturaH
 , @periodoD, @periodoH
 , @zonaD, @zonaH
 , @ctrcod;
-
-
-
-
 
 EXEC Liquidaciones_RegistrosContratos_AVG_nuevo @fechaFacturaD, @fechaFacturaH
 , @fechaLiquidacionD, @fechaLiquidacionH
@@ -89,9 +85,11 @@ BEGIN TRY
 	--*********************************************************
 	--*********************************************************
 	--[01]#FACLIN: Facturas con sus lineas de canon (19, 20, 60)
-	SELECT F.faccod, F.facCtrCod, F.facPerCod, F.facVersion, F.facCtrVersion, F.facNumero
+	SELECT F.faccod, F.facCtrCod, F.facPerCod, F.facVersion, F.facNumero
 	, F.facFecha
 	, F.facFechaRectif
+	, F.facCtrVersion
+	, [ctrTitDocIden] = UPPER(LTRIM(RTRIM(C.ctrTitDocIden)))
 	, [facUso] = CAST(NULL AS VARCHAR(1))
 	, [fclUso] = CASE FL.fclTrfSvCod WHEN 20 THEN IIF(T.trfCod IS NOT NULL, 'D', 'N') ELSE NULL END
 	--[FacturaAnulada]=1 : Facturas que no tomaremos en cuenta para la liquidación
@@ -239,12 +237,12 @@ BEGIN TRY
 	--[10]#FACS: Ya tenemos todos los datos de las lineas de la factura
 	--Vamos a hora a centrarnos en la informacion que necesitamos de cada factura
 	--Una linea por factura
-	SELECT facCod, facCtrCod, facPerCod, facVersion, facCtrVersion, facNumero
-	, facFecha, facFechaRectif
-	, facUso
-	, Siguiente_facVersion
-	, Anterior_facVersion, Anterior_ServiciosCanon 
-
+	SELECT facCod, facCtrCod, facPerCod, facVersion, facNumero
+	, F.facFecha, F.facFechaRectif
+	, F.facCtrVersion, F.ctrTitDocIden
+	, F.facUso
+	, F.Siguiente_facVersion
+	, F.Anterior_facVersion, F.Anterior_ServiciosCanon 
 
 	--NumFacActivas: Facturas sin fecha de rectificacion por version de contrato
 	, NumFacActivas = SUM(IIF(facFechaRectif IS NULL, 1, 0)) OVER (PARTITION BY F.facCtrCod, F.facCtrVersion)
@@ -271,15 +269,51 @@ BEGIN TRY
 	--*********************************************************
 	--[20]#CTR: Ya tenemos todos los datos de las facturas
 	--Vamos a hora a sacar un registro por versión de contrato
-	SELECT facCtrCod, facCtrVersion
-	, facUso --El uso de la ultima factura asociada a esta version de contrato 
+	SELECT facCtrCod, facCtrVersion, ctrTitDocIden
+	, F.facUso --El uso de la ultima factura asociada a esta version de contrato
+	--*****************************************************************************
+	--*** Lead (anterior) y Lag (siguiente)
+	--*** Para saber si el cambio de version es por cambio de titular ***
+	--Si estamos en la version 1 y la version siguiente en esta selección es la "x"
+	--[TitularLead] es el titular de la version "x"
+	, [TitularLead] = LEAD(F.ctrTitDocIden) OVER (PARTITION BY F.facCtrCod ORDER BY F.facCtrVersion ASC)
+	
+	--Si estamos en la version x y la version anterior en esta selección es la "1"
+	--[TitularLag] es el titular de la version "1"
+	, [TitularLag] = LAG(F.ctrTitDocIden) OVER (PARTITION BY F.facCtrCod ORDER BY F.facCtrVersion ASC)
+	--*****************************************************************************
 	--Numero de versiones que tenemos para cada contrato
 	, CN=COUNT(facCtrVersion) OVER (PARTITION BY facCtrCod)
 	, RN=ROW_NUMBER() OVER (ORDER BY facCtrCod, facCtrVersion ASC) 
-	INTO #CTR
+	INTO #CTR 
 	FROM #FACS AS F
 	WHERE RN_CTR=1
 	AND (ISNULL(NumFacActivas, 0)>0 OR ISNULL(NumFacRectificativas, 0)>0);
+
+	--*********************************************************
+	--*********************************************************
+	--[30]#CTR_TITULAR: Para cada combinación: (contrato, titular) 
+	--Buscamos las ultima versión RN=1
+	SELECT C.ctrcod
+	, C.ctrTitDocIden
+	, C.ctrTitTipDoc
+	, C.ctrversion
+	, ctrTitNom = SUBSTRING(C.ctrTitNom,1,125)
+	, ctrTitDir = C.ctrTitDir
+	, C.ctrfecreg
+	, C.ctrfecanu
+	, C.ctrComunitario
+	, C.ctrValorc1
+	, C.ctrinmcod
+	, flagBaja = IIF(C.ctrbaja IS NOT NULL AND C.ctrbaja=1 AND C.ctrfecanu>=@facFechaD AND C.ctrfecanu<@facFechaH, C.ctrbaja , 0)
+	--RN=1: Ultima versión de la combinacion contrato, titular: De donde tomaremos los datos 
+	, RN = ROW_NUMBER() OVER (PARTITION BY CC.facCtrCod, CC.ctrTitDocIden ORDER BY CC.facCtrVersion DESC) 
+	INTO #CTR_TITULAR
+	FROM #CTR AS CC
+	INNER JOIN dbo.contratos AS C
+	ON C.ctrcod= CC.facCtrCod
+	AND C.ctrversion = CC.facCtrVersion;
+	
 
 
 	--*********************************************************
@@ -287,49 +321,52 @@ BEGIN TRY
 	--*********************************************************
 	SELECT C.ctrcod
 	, C.ctrversion
-	, C.ctrTitDocIden
+	--Los datos los traemos de la ultima vesion por combinación CT (Contrato, Titular)
+	, CT.ctrTitDocIden
 	, [tipo]= 'C'
-	, [tipoIdent] = CASE WHEN C.ctrTitTipDoc IN ('0','1') THEN 'F'
-						WHEN C.ctrTitTipDoc IN ('2','4') THEN 'E'
+	, [tipoIdent] = CASE WHEN CT.ctrTitTipDoc IN ('0','1') THEN 'F'
+						WHEN CT.ctrTitTipDoc IN ('2','4') THEN 'E'
 						ELSE 'O' END
-	, [nomTit] = SUBSTRING(C.ctrTitNom,1,125)
-	, [titDir] = IIF(C.ctrTitDir <> I.inmDireccion, SUBSTRING(C.ctrTitDir, 1 ,250), NULL)
+	, [nomTit] = CT.ctrTitNom
+	, [titDir] = IIF(CT.ctrTitDir <> I.inmDireccion, SUBSTRING(CT.ctrTitDir, 1 ,250), NULL)
 	, [titPrv] = '11'
 	, [titPob] = '0337'
-	, [contador] = IIF(C.ctrComunitario IS NULL AND C.ctrValorc1 > 1,  'C' , 'I')
+	, [contador] = IIF(CT.ctrComunitario IS NULL AND CT.ctrValorc1 > 1,  'C' , 'I')
 	, [uso] = CC.facUso
-	, [usuarios] = IIF(C.ctrComunitario IS NULL AND C.ctrValorc1 > 1, C.ctrValorc1, NULL)
+	, [usuarios] = IIF(CT.ctrComunitario IS NULL AND CT.ctrValorc1 > 1, CT.ctrValorc1, NULL)
 	, refCatastral = IIF(LEN(TRIM(I.inmrefcatastral)) = 20, TRIM(I.inmrefcatastral), NULL)	
 	, dirAbastecida = SUBSTRING(I.inmDireccion, 1, 250)
 	, periodicidad = 3
 	, C.ctrfecreg
 	, C.ctrfecanu
-	, C.ctrbaja
-	, [indAlta] = CASE  WHEN C.ctrVersion=1 AND C.ctrfecreg>=@facFechaD AND C.ctrfecreg<@facFechaH THEN 'C'
-						WHEN C.ctrTitDocIden <> C0.ctrTitDocIden THEN 'T'
-						ELSE NULL END
-	, [indBaja] = CASE	WHEN C.ctrbaja=1 AND C.ctrfecanu>=@facFechaD AND C.ctrfecanu<@facFechaH THEN 'C'
-						WHEN C.ctrTitDocIden <> C0.ctrTitDocIden THEN 'T'
-						ELSE NULL END
+	
+	, [ctrbaja] = CT.flagBaja
+	, [indAlta] = CASE WHEN C.ctrVersion=1 AND C.ctrfecreg>=@facFechaD AND C.ctrfecreg<@facFechaH THEN 'C'
+					   WHEN CC.ctrTitDocIden <> CC.TitularLag	THEN 'T'
+					   ELSE NULL END
+
+	, [indBaja] = CASE WHEN CT.flagBaja=1 AND C.ctrfecanu>=@facFechaD AND C.ctrfecanu<@facFechaH THEN 'C'
+					   WHEN CC.ctrTitDocIden <> CC.TitularLead THEN 'T'
+					   ELSE NULL END	
 	, CC.RN
 	FROM #CTR AS CC
-	INNER JOIN dbo.contratos AS C
+	LEFT JOIN #CTR_TITULAR AS CT
+	ON  CT.ctrcod = CC.facCtrCod
+	AND CT.ctrTitDocIden = CC.ctrTitDocIden
+	AND CT.RN=1
+	LEFT JOIN dbo.contratos AS C
 	ON C.ctrcod = CC.facCtrCod
 	AND C.ctrversion = CC.facCtrVersion
-	LEFT JOIN dbo.contratos AS C0
-	ON C.ctrversion>1
-	AND C0.ctrcod = C.ctrcod
-	AND C0.ctrversion = (C.ctrversion-1)
-	AND C.ctrversion = CC.facCtrVersion
 	LEFT JOIN dbo.inmuebles AS I
-	ON I.inmcod = C.ctrinmcod
-	ORDER BY facCtrCod, facCtrVersion;
+	ON I.inmcod = CT.ctrinmcod
+	ORDER BY CC.facCtrCod, CC.facCtrVersion;
 	
 	--***  D E B U G  ***
 	IF (@ctrcod IS NOT NULL)
 	BEGIN
 		
 		SELECT '#CTR',  * FROM #CTR;
+		SELECT '#CTR_TITULAR',  * FROM #CTR_TITULAR;
 		SELECT '#FACS', * FROM #FACS;
 		SELECT '#FACLIN', * FROM #FACLIN;	
 	END
@@ -341,5 +378,6 @@ END CATCH
 DROP TABLE IF EXISTS #FACLIN;
 DROP TABLE IF EXISTS #FACS;
 DROP TABLE IF EXISTS #CTR;
+DROP TABLE IF EXISTS #CTR_TITULAR;
 
 GO
