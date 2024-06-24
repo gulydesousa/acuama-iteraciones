@@ -9,10 +9,10 @@ DECLARE @fechaFacturaD AS DATETIME = '20220101',
 @periodoH AS VARCHAR(6) = NULL,
 @zonaD AS VARCHAR(4) = NULL,
 @zonaH AS VARCHAR(4) = NULL
-, @ctrcod AS INT --= 31810
+, @ctrcod AS INT-- = 1908
 
 
-EXEC Liquidaciones_RegistrosContratos_AVG @fechaFacturaD, @fechaFacturaH
+EXEC Liquidaciones_RegistrosContratos_AVG_old @fechaFacturaD, @fechaFacturaH
 , @fechaLiquidacionD, @fechaLiquidacionH
 , @periodoD, @periodoH
 , @zonaD, @zonaH

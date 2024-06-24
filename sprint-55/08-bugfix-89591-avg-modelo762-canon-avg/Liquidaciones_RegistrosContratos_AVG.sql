@@ -1,5 +1,4 @@
 
-/*
 DECLARE @fechaFacturaD AS DATETIME = '20230201',
 @fechaFacturaH AS DATETIME = '20231231',
 @fechaLiquidacionD AS DATETIME = NULL,
@@ -8,9 +7,10 @@ DECLARE @fechaFacturaD AS DATETIME = '20230201',
 @periodoH AS VARCHAR(6) = NULL,
 @zonaD AS VARCHAR(4) = NULL,
 @zonaH AS VARCHAR(4) = NULL
-, @ctrcod AS INT --= 31810
+, @ctrcod AS INT = 8
 
 
+/*
 EXEC Liquidaciones_RegistrosContratos_AVG @fechaFacturaD, @fechaFacturaH
 , @fechaLiquidacionD, @fechaLiquidacionH
 , @periodoD, @periodoH
@@ -23,7 +23,7 @@ EXEC Liquidaciones_RegistrosContratos_AVG_nuevo @fechaFacturaD, @fechaFacturaH
 , @periodoD, @periodoH
 , @zonaD, @zonaH
 , @ctrcod;
-*/
+
 
 
 CREATE PROCEDURE [dbo].[Liquidaciones_RegistrosContratos_AVG_nuevo]
@@ -37,7 +37,7 @@ CREATE PROCEDURE [dbo].[Liquidaciones_RegistrosContratos_AVG_nuevo]
 @zonaH AS VARCHAR(4) = NULL,
 @ctrcod AS INT  = NULL
 AS
-
+*/
 DECLARE @facFechaD DATE;
 DECLARE @facFechaH DATE;
 
@@ -46,7 +46,6 @@ DECLARE @fechaPerH AS DATE;
 
 SET @fechaPerD = (SELECT TOP 1 przfPeriodoD FROM dbo.perzona AS P WHERE P.przcodper = @periodoD)
 SET @fechaPerH = (SELECT TOP 1 przfPeriodoH FROM dbo.perzona AS P WHERE P.przcodper = @periodoH)
-
 
 SELECT @facFechaD = IIF(@fechaFacturaD IS NOT NULL, @fechaFacturaD, NULL),
 	   @facFechaH = IIF(@fechaFacturaH IS NOT NULL, DATEADD(DAY, 1, @fechaFacturaH), NULL),
@@ -144,6 +143,10 @@ BEGIN TRY
 			)
 		);	
 
+	--*** D E B U G ****
+	--SELECT * FROM #AUX;
+
+
 
 	--*********************************************
 	--[02]Vemos si las rectificadas tenían el servicio de canon: #AUX.Rectificada_TieneCanon
@@ -225,7 +228,7 @@ BEGIN TRY
 	WHERE Ctr_RN=1 AND --Un registro por cada version de contrato
 	(NumOriginalesxCtr>0 OR NumRectificativasConCanon>0);
 
-
+	--SELECT * FROM #CTRS;
 
 	--*********************************************
 	--[11]Los indicadores de alta y baja C, T: #CTRS.indAlta, #CTRS.indBaja
@@ -248,7 +251,7 @@ BEGIN TRY
 	ON I.ctrcod = C.ctrCod
 	AND I.ctrVersion = C.ctrVersion;
 
-
+	--SELECT * FROM #CTRS
 
 	--*********************************************
 	--*********** R E S U L T A D O ***************
@@ -283,6 +286,8 @@ BEGIN TRY
 	, RN = ROW_NUMBER() OVER (PARTITION BY ctrcod, ctrTitDocIden ORDER BY  ctrVersion DESC)
 	INTO #RESULT
 	FROM #CTRS AS C;
+
+	SELECT * FROM #RESULT;
 	
 	WITH REGC AS(
 	--Ultima version del contrato
@@ -335,12 +340,12 @@ BEGIN TRY
 	AND C.ctrVersion = V.versionC
 	ORDER BY R.contrato, R.ctrVersion;
 	
-	IF @ctrcod IS NOT NULL
-	BEGIN
-		SELECT * FROM #AUX;
-		SELECT * FROM #CTRS;
-		SELECT * FROM #RESULT;
-	END
+	--IF @ctrcod IS NOT NULL
+	--BEGIN
+	--	SELECT * FROM #AUX;
+	--	SELECT * FROM #CTRS;
+	--	SELECT * FROM #RESULT;
+	--END
 
 END TRY
 

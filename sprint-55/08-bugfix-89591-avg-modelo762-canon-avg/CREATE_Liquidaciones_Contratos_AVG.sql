@@ -7,7 +7,7 @@ DECLARE @fechaFacturaD AS DATETIME = '20230201',
 @periodoH AS VARCHAR(6) = NULL,
 @zonaD AS VARCHAR(4) = NULL,
 @zonaH AS VARCHAR(4) = NULL
-, @ctrcod AS INT = 32662
+, @ctrcod AS INT = 1244
 
 
 EXEC dbo.Liquidaciones_Contratos_AVG @fechaFacturaD, @fechaFacturaH
