@@ -108,6 +108,8 @@ AS
 	/*SELECT * 
 	FROM (VALUES('Recibos: Cobros y Efectos Pendientes')) 
 	AS DataTables(Grupo);*/
+	
+
 
 	--**************
 	--[01]Sacamos las facturas que por fechas son las que conformarían el reporte
@@ -155,12 +157,16 @@ AS
 	(P.fechaD IS NULL OR F.facFecha >= P.fechaD) AND
 	(P.fechaH IS NULL OR F.facFecha < P.fechaH)
 	)
-
-	AND facCtrCod=110068111
+	AND C.ctrTitDocIden='P3803800F'
+	
 	)
 
 	SELECT * INTO #FACS 
 	FROM FACS;
+
+	
+
+	
 
 	--**************
 	--[02]Totalizamos las lineas de las facturas con un update en la tabla #FACS
@@ -269,7 +275,9 @@ AS
 	AND F.facPerCod = FT.facPerCod
 	AND F.facCtrCod = FT.facCtrCod
 	AND F.facVersion = FT.facVersion;
-		
+	
+
+
 	--**************
 	--[05]Calculamos todos los estados de las facturas y setearemos con un UPDATE 
 	---- #FACS.facEstadoEmmasa: Estado según EMMASA
@@ -323,7 +331,6 @@ AS
 	OR F.facFechaRectif IS NOT NULL;
 
 
-	SELECT * FROM #FACS WHERE facNumeroAqua='RE2000002912';
 	
 	--**************
 	--[11]Totalizamos los cobros por FACTURA
@@ -406,6 +413,7 @@ AS
 	AND EP.efePdteFecRechazado IS NULL
 	AND R.RN=1;
 
+	
 	--**************
 	--[31]Para calcular el estado del pago necesitamos detalles del total de los cobros asi como el último cobro 
 	---- #RECIBOCOB: Tabla donde guardamos los totales de los cobros por RECIBOS
@@ -647,7 +655,8 @@ AS
 	AND R.facVersion = FF.facVersion;
 
 
-	SELECT * FROM #EDOCOB WHERE facNumeroAqua='RE2000002912'
+
+
 	--**************
 	--[RR] RESULTADO FINAL:
 	--**************
@@ -679,6 +688,9 @@ AS
 	WHERE E.cobEstado NOT IN ('CO', 'TR', 'CM','FR')
 	ORDER BY R.facNumeroAqua, R.efePdteCod;
 
+
+		
+
 	--********************
 	--[R2]Estados de los contratos
 	CREATE TABLE #EDOCTR(
@@ -693,6 +705,8 @@ AS
 
 	INSERT INTO #EDOCTR
 	EXEC InformesExcel.contratosEstados_EMMASA;
+
+
 
 	--**************
 	--[R3] Columnas del resultado relevantes para la salida del informe.
@@ -746,6 +760,8 @@ AS
 	LEFT JOIN dbo.series AS S
 	ON S.sercod = F.facSerCod;
 
+	SELECT * FROM #RESULT;
+
 	/*
 	--********************
 	--DataTable[3]:  Datos
@@ -776,7 +792,7 @@ AS
 	--MUY IMPORTANTE garantizar el orden deterministico en ambas tablas
 	ORDER BY Año, facNumeroAqua, ID;
 	*/
-
+	
 	SELECT 
 	 ctrTitDocIden AS [NIF]
 	, ctrTitNom AS [Nombre]
@@ -786,6 +802,7 @@ AS
 	, deuda * IIF(cobEstado IS NOT NULL AND cobEstado='PD', 0, 1) AS [Importe PAGO]
 	, deuda * IIF(cobEstado IS NOT NULL AND cobEstado='PD', -1, 0) AS [Importe DEVOLUCION]
 	FROM #REPORT AS R
+	WHERE ctrTitDocIden='P3803800F'
 	UNION ALL
 	SELECT 
 	NIF,
@@ -796,7 +813,9 @@ AS
 	[Importe PAGO],
 	[Importe DEVOLUCION]
 	FROM #ENTREGASCUENTA
-	ORDER BY NIF, [Factura], [Fecha Factura]	
+		WHERE NIF='P3803800F'
+	ORDER BY NIF, [Factura], [Fecha Factura]
+	
 
 
 	END TRY

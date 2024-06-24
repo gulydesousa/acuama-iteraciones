@@ -1,7 +1,7 @@
 DECLARE @p_params NVARCHAR(MAX);
 DECLARE @p_errId_out INT;
 DECLARE @p_errMsg_out NVARCHAR(2048);
-SET @p_params= '<NodoXML><LI><FecDesde>20140106</FecDesde><FecHasta>20240529</FecHasta></LI></NodoXML>';
+SET @p_params= '<NodoXML><LI><FecDesde>20140601</FecDesde><FecHasta>20240529</FecHasta></LI></NodoXML>';
 /*
 EXEC [dbo].[Excel_ExcelConsultas.DeudaAuditoresSevilla_EMMASA]  @p_params,  @p_errId_out OUTPUT, @p_errMsg_out OUTPUT;
 SELECT @p_errMsg_out
@@ -21,7 +21,7 @@ AS
 	--**********
 
 	SET NOCOUNT ON;   
-	BEGIN TRY
+	--BEGIN TRY
 	
 	--********************
 	--INICIO: 2 DataTables
@@ -71,62 +71,60 @@ AS
 	SELECT @DOMICILIACION=mpccod 
 	FROM dbo.medpc AS M WHERE M.mpcdes = 'Domiciliación bancar';
 
-	/*
-	select v1.ctrTitDocIden AS [NIF]
-	INTO #ENTREGAPORNIF
-	from cobros C
-	inner join coblin on cblPpag = cobPpag and cblNum = cobNum and cblScd = cobScd
-	inner join vContratoUltVersion v1 on v1.ctrcod = cobCtr
-	INNER JOIN @params AS P ON
-	(--Cobros de entrega a cuenta creados entre las fechas
-	(P.fechaD IS NULL OR C.cobFec >= P.fechaD) AND
+	--[01]Entregas a cuenta: pendientes por cliente
+	SELECT CTR.ctrTitDocIden, CTR.ctrTitCod
+	, EntregasCta = SUM(CL.cblImporte)
+	INTO #ECTR
+	FROM dbo.cobros AS C
+	INNER JOIN dbo.coblin AS CL 
+	ON CL.cblPer = '999999'
+	AND CL.cblPpag = C.cobPpag 
+	AND CL.cblNum = C.cobNum 
+	AND CL.cblScd = C.cobScd
+	INNER JOIN dbo.vContratoUltVersion AS CTR 
+	ON CTR.ctrcod = C.cobCtr
+	--Cobros de entrega a cuenta creados entre las fechas
+	INNER JOIN @params AS P 
+	ON (P.fechaD IS NULL OR C.cobFec >= P.fechaD)  AND 
 	(P.fechaH IS NULL OR C.cobFec < P.fechaH)
-	)	where 
-	cblPer = '999999'		
-	group by v1.ctrTitDocIden, v1.ctrTitNom
-	HAVING SUM(cblImporte) <> 0;
+	GROUP BY CTR.ctrTitDocIden, CTR.ctrTitCod
+	HAVING SUM(CL.cblImporte)<>0;
+	
+	--*** DEBUG ****
+	--SELECT * FROM #ECTR WHERE ctrTitDocIden='P3803800F';
 
-	CREATE TABLE #ENTREGASCUENTA (NIF VARCHAR(100) collate Modern_Spanish_CI_AS, Nombre VARCHAR(200) collate  Modern_Spanish_CI_AS, Factura VARCHAR(12) collate  Modern_Spanish_CI_AS, [Fecha Factura] DATE, estado VARCHAR(2) collate  Modern_Spanish_CI_AS, [Importe PAGO] MONEY, [Importe DEVOLUCION] MONEY)
-	
-	INSERT INTO #ENTREGASCUENTA
-	select v1.ctrTitDocIden AS [NIF], v1.ctrTitNom AS Nombre, NULL AS Factura, CONVERT(DATE,cobFec) AS [Fecha Factura], 'PD' AS Estado, 0 AS [Importe PAGO],  SUM(cblImporte) AS [Importe DEVOLUCION] 	
-	from cobros C
-	inner join coblin on cblPpag = cobPpag and cblNum = cobNum and cblScd = cobScd
-	inner join vContratoUltVersion v1 on v1.ctrcod = cobCtr
-	INNER JOIN #ENTREGAPORNIF ENIF ON ENIF.NIF = V1.ctrTitDocIden
-	INNER JOIN @params AS P ON
-	(--Cobros de entrega a cuenta creados entre las fechas
-	(P.fechaD IS NULL OR C.cobFec >= P.fechaD) AND
-	(P.fechaH IS NULL OR C.cobFec < P.fechaH)
-	)	where 
-	cblPer = '999999'		
-	group by v1.ctrTitDocIden, v1.ctrTitNom, cobFec
-	HAVING SUM(cblImporte) <> 0;	
-	*/
-	
-	DECLARE @sql NVARCHAR(MAX);
+	--[02]Entregas a cuenta: pendientes por titular
+	SELECT ctrTitDocIden
+	, EntregasCta = SUM(EntregasCta)
+	INTO #EC
+	FROM #ECTR AS C
+	GROUP BY ctrTitDocIden;
+
 	--**************
-	--[00]TOTAL FACTURAS: Sacamos las facturas que por fechas son las que conformarían el reporte
+	--[10]TOTAL FACTURAS: Sacamos las facturas que por fechas son las que conformarían el reporte
 	-- #FACTOTALES
+	DECLARE @sql NVARCHAR(MAX);
+	
 	SELECT T.ftfFacCod, T.ftfFacPerCod, T.ftfFacCtrCod, T.ftfFacVersion, T.ftfImporte
 	INTO #FACTOTALES
-	FROM dbo.fFacturas_TotalFacturado(NULL, NULL, NULL) AS T;
+	FROM _FACTOTALES AS T;
+	--FROM dbo.fFacturas_TotalFacturado(NULL, NULL, NULL) AS T;
 
 	SET @sql = N'CREATE CLUSTERED INDEX IDX_' + REPLACE(CONVERT(NVARCHAR(50), NEWID()), '-', '') + ' ON #FACTOTALES(ftfFacCod, ftfFacPerCod, ftfFacCtrCod, ftfFacVersion)';
 	EXEC sp_executesql @sql;
 	
 	--**************
-	--[01]FACTURAS: Sacamos las facturas que por fechas son las que conformarían el reporte
+	--[11]FACTURAS: Sacamos las facturas que por fechas son las que conformarían el reporte
 	-- #FACS: Filtramos las facturas que van para el informe
 	SELECT F.facCod
 	, F.facPerCod
 	, F.facCtrCod
 	, F.facVersion	
-	, F.facFecha
+	, F.facCtrVersion
 	, F.facNumero
-	, F.facSerCod
-	, F.facNumeroAqua
 	, F.facEstado
+	, F.facNumeroAqua
+	, C.ctrTitDocIden 
 	--**********************
 	, F.facFechaRectif
 	, F.facNumeroRectif
@@ -151,23 +149,25 @@ AS
 	AND F.facPerCod = FT.ftfFacPerCod
 	AND F.facCtrCod = FT.ftfFacCtrCod
 	AND F.facVersion = FT.ftfFacVersion	
+	INNER JOIN dbo.contratos AS C
+	ON C.ctrcod = F.facCtrCod AND C.ctrversion = F.facCtrVersion
 	--Facturas creadas dentro del rango de fechas
 	INNER JOIN @params AS P
 	ON  (P.fechaD IS NULL OR F.facFecha >= P.fechaD) 
 	AND (P.fechaH IS NULL OR F.facFecha < P.fechaH)
 
 	WHERE F.facNumero IS NOT NULL	--Se excluyen las prefacturas
-	AND F.facEstado NOT IN (4,5);	--Se excluyen las (4) AGRUPADAS NI (5) TRASPASADAS. No es deuda 	
+	AND F.facEstado NOT IN (4,5)	--Se excluyen las (4) AGRUPADAS NI (5) TRASPASADAS. No es deuda 	
+	AND ctrTitDocIden='P3803800F';
 
 	SET @sql = N'CREATE CLUSTERED INDEX IDX_' + REPLACE(CONVERT(NVARCHAR(50), NEWID()), '-', '') + ' ON #FACS(facCod, facPerCod, facCtrCod, facVersion)';
 	EXEC sp_executesql @sql;	
 	
 	--*** DEBUG ***
 	--SELECT * FROM #FACS;
-	
-	
+		
 	--**********************
-	--[02]RECTIFICATIVAS: Para saber las "Anuladas", tenemos que calcular el importe de las facturas rectificativas
+	--[12]RECTIFICATIVAS: Para saber las "Anuladas", tenemos que calcular el importe de las facturas rectificativas
 	-- #FACS.facImporteRectif: Importe de la factura rectificativa
 	UPDATE FF SET FF.facImporteRectif = T.ftfImporte
 	FROM #FACS AS FF
@@ -187,7 +187,7 @@ AS
 	
 	
 	--**************
-	--[04]Para saber las que están en estado "Rechazada". Lo setearemos con un UPDATE 
+	--[13]Para saber las que están en estado "Rechazada". Lo setearemos con un UPDATE 
 	-- #FACS.facRfsCodigo: Rechazadas
 	-- #FACS.facEstadoEmmasa: Estados de Emmasa
 	WITH RECHAZADAS AS (
@@ -235,10 +235,9 @@ AS
 
 	--**** DEBUG *****
 	--SELECT * FROM #FACS;
-	
 
 	--**************
-	--[05]Borramos de la tabla #FACS las que no nos interesan, por su estado, para sacar el informe
+	--[14]Borramos de la tabla #FACS las que no nos interesan, por su estado, para sacar el informe
 	-- #FACS: Excluimos facturas que no se toman en cuenta para el informe
 	DELETE FROM F
 	FROM #FACS AS F
@@ -250,7 +249,7 @@ AS
 
 
 	--**** DEBUG *****
-	SELECT * FROM #FACS;
+	--SELECT * FROM #FACS;
 	
 	--**************
 	--[20]Recuperamos los Efectos pendientes de las facturas:
@@ -259,13 +258,7 @@ AS
 	, F.facCtrCod
 	, F.facPerCod
 	, F.facVersion
-	, F.facNumeroAqua
-	, F.facEstado
-	, F.facEstadoEmmasa
-	, F.facNumeroRectif
-	, F.facImporteRectif
-	, F.facFechaVto
-	, F.facFechaVtoOrig
+	, F.ctrTitDocIden
 	, EP.efePdteCod
 	, EP.efePdteScd
 	, EP.efePdteImporte
@@ -342,12 +335,13 @@ AS
 	AND CLEP.cleCblNum = CBL.cblNum
 	AND CLEP.cleCblLin = CBL.cblLin;
 	
-
-
-	--[40] Facturas
-	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion, F.facNumeroAqua
-	, F.facEstado, F.facEstadoEmmasa
+	--**** DEBUG *****
+	--SELECT * FROM #COBS;
+	
+	--[41] Estado: Facturas
+	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion
 	, F.facTotal
+	, F.ctrTitDocIden
 	, EPS.TOTAL_EPS --Totalizacion de los efectos pendientes
 	, C.TOTAL_COB	--Total cobrado por factura
 	, C.CN_COB		--Numero de cobros
@@ -363,11 +357,6 @@ AS
 	WHEN ROUND(ISNULL(C.TOTAL_COB, 0), 2) > F.facTotal  THEN 'PD' 
 	--CM: Compensando / Facturas cobradas por el punto de pago compensación (todos los cobros son por compensación)
 	WHEN ROUND(ISNULL(C.TOTAL_COB, 0), 2) = F.facTotal AND C.CN_COB IS NOT NULL AND C.CN_COB > 0 AND C.CN_COB = C.CN_COB_COMP THEN 'CM' 
-	--AN: Anulado/ Facturas anuladas
-	--Además de tener la original rellenos los campos de rectificación la rectificativa tiene importe 0
-	WHEN F.facNumeroRectif IS NOT NULL AND F.facImporteRectif = 0 THEN 'AN'
-	--TR: Traspasado/Facturas con facEstado = 5
-	WHEN (F.facEstado = 5) THEN 'TR'
 	--CD: Cobro detenido/Facturas con facEstado = 6
 	WHEN (F.facEstado = 6) THEN 'CD'
 	--CO: Cobrado/ factura cobrada
@@ -378,7 +367,7 @@ AS
 	--Existe un último cobro con importe negativo y con origen devolución
 	WHEN C.CN_COB IS NOT NULL AND C.CN_COB > 0 AND C.cblImporte IS NOT NULL AND C.cblImporte  < 0  AND C.cobMpc = @DOMICILIACION THEN  'DE'
 	--AP: Aplazado/ cuando la fecha de vencimiento esta rellena y es distinta a la fecha de Vto original
-	WHEN (F.facFechaVto IS NOT NULL) AND (F.facFechaVtoOrig IS NOT NULL AND F.facFechaVto<>F.facFechaVtoOrig) THEN 'AP'
+	WHEN F.facFechaVto IS NOT NULL AND F.facFechaVtoOrig IS NOT NULL AND F.facFechaVto<>F.facFechaVtoOrig THEN 'AP'
 	--NO: Notificado/ PENDIENTE de cobrar sin vencer. La fecha vencimiento de la factura no se ha cumplido aun 
 	WHEN (ISNULL(F.facFechaVto, F.facFechaVtoOrig) >= @ahora) THEN 'NO'	
 	ELSE '' END
@@ -395,30 +384,25 @@ AS
 	AND EPS.facCtrCod = F.facCtrCod
 	AND EPS.facPerCod = F.facPerCod
 	AND EPS.RN_EP = 1; --Ultimo efecto pendiente
+	
+	--***DEBUG***
+	--SELECT * FROM #EDO_FAC;
 
-
-	--[50] Efectos Pendientes
-	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion, F.facNumeroAqua
-	, F.facEstado, F.facEstadoEmmasa
+	--[42] Estado: Efectos Pendientes
+	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion
+	, F.ctrTitDocIden
 	, F.efePdteImporte
-	, TOTAL_EPS = NULL	--Totalizacion de los efectos pendientes
+	, F.efePdteCod
 	, C.TOTAL_EPCOB		--Total cobrado por efecto pendiente
 	, C.CN_EPCOB		--Numero de cobros por efecto pendiente
-	, CN_COB_COMP=NULL	--Numero de cobros por compensación
-	, CN_EP=NULL		--Numero de efectos pendientes por factura
 	--********************
 	--FACTURA ESTADO PAGO
 	--********************
 	, [cobEstado] = CASE 
 	--PD: Si el importe cobrado supera el importe total del efecto pendiente (Pendiente devolución)
 	WHEN ROUND(ISNULL(C.TOTAL_EPCOB, 0), 2) > F.efePdteImporte  THEN 'PD' 
-	--AN: Anulado/ Facturas anuladas
-	--Además de tener la original rellenos los campos de rectificación la rectificativa tiene importe 0
-	WHEN F.facNumeroRectif IS NOT NULL AND F.facImporteRectif = 0 THEN 'AN'	
-	--TR: Traspasado/Facturas con facEstado = 5
-	WHEN (F.facEstado = 5) THEN 'TR'
-	--CD: Cobro detenido/Facturas con facEstado = 6
-	WHEN (F.facEstado = 6) THEN 'CD'
+	--CD: Cobro detenido/Facturas
+	WHEN EF.cobEstado IN ('CD') THEN EF.cobEstado
 	--CO: Cobrado/ factura cobrada
 	WHEN ROUND(ISNULL(C.TOTAL_EPCOB, 0), 2) = F.efePdteImporte THEN 'CO'
 	--VE: Vencido/ Facturas no cobradas y la fecha de vencimiento se ha cumplido. Prevalece sobre el aplazado
@@ -426,13 +410,18 @@ AS
 	--DE: Devuelto/ Solo cuando la devolución es de banco
 	--Existe un último cobro con importe negativo y con origen devolución
 	WHEN C.CN_COB IS NOT NULL AND C.CN_COB > 0 AND C.cblImporte IS NOT NULL AND C.cblImporte  < 0  AND C.cobMpc = @DOMICILIACION THEN  'DE'
-	--AP: Aplazado/ cuando la fecha de vencimiento esta rellena y es distinta a la fecha de Vto original
-	WHEN F.facFechaVto IS NOT NULL AND F.facFechaVtoOrig IS NOT NULL AND F.facFechaVto<>F.facFechaVtoOrig THEN 'AP'
+	--AP: Aplazado
+	WHEN EF.cobEstado IN ('AP') THEN EF.cobEstado
 	--NO: Notificado/ PENDIENTE de cobrar sin vencer. La fecha vencimiento de la factura no se ha cumplido aun 
 	WHEN F.efePdteFecVencimiento >=  @ahora THEN 'NO'
 	ELSE '' END
 	INTO #EDO_EPS
-	FROM #EPS AS F	
+	FROM #EPS AS F
+	INNER JOIN #EDO_FAC AS EF
+	ON EF.facCod = F.facCod
+	AND EF.facCtrCod = F.facCtrCod
+	AND EF.facPerCod = F.facPerCod
+	AND EF.facVersion = F.facVersion
 	LEFT JOIN #COBS AS C
 	ON  C.RN_EPCOB=1 --Ultimo cobro por efecto pendiente
 	AND F.facCod = C.facCod
@@ -440,299 +429,81 @@ AS
 	AND F.facCtrCod = C.facCtrCod
 	AND F.efePdteCod = C.clefePdteCod;
 	
+	--*** DEBUG ****
+	--SELECT * FROM #EDO_EPS;
 	
-
-
-
-	--SELECT * FROM #FACS WHERE facNumeroRectif IS NOT NULL;
+	--[50]Recibos
+	SELECT EP.facCod, EP.facPerCod, EP.facCtrCod, EP.facVersion, EP.ctrTitDocIden, EP.cobEstado
+	, ImporteRecibo= EP.efePdteImporte
+	, Cobrado=ISNULL(EP.TOTAL_EPCOB, 0)
+	, EP.efePdteCod
+	, DeudaRecibo=EP.efePdteImporte-ISNULL(EP.TOTAL_EPCOB, 0)
+	INTO #RECIBOS
+	FROM #EDO_EPS AS EP
+	WHERE EP.cobEstado NOT IN('CO', 'TR', 'CM', 'FR');
 	
-	/*
-
 	
-	
-
-	--**************
-	--[41] Finalmente tenemos todo para calcular el ESTADO DE LOS PAGOS.
-	---- #EDOCOB: Tabla con las facturas de la consulta y su ESTADO DE PAGO
-	SELECT R.facCod
-	, R.facPerCod
-	, R.facCtrCod
-	, R.facVersion
-	, R.efePdteCod 
-	, R.efePdteScd
-	--***************
-	, R.facNumeroAqua
-	, R.facTotal
-	--Nos quedamos con una sola versión de contrato. La mayor:
-	, MAX(R.facCtrVersion) OVER (PARTITION BY R.facCtrCod) AS ctrVersion 
-	, R.efePdteImporte
-	, R.efePdteTotal
-	, R.efePdteFecVencimiento
-	--***************
-	, R.ultCobNum 
-	, R.totalCobrado
-	, R.facNumCobros	
-	--********************
-	--FACTURA ESTADO PAGO
-	--********************
-	, CASE 
-	--FR: Fraccionado/ una factura con efectos pendientes
-	WHEN R.efePdteCod IS NULL AND R.efePdtes IS NOT NULL AND R.efePdtes>0 THEN 'FR'
-
-	--PD: Si el importe deuda es negativo (Pendiente devolución)
-	WHEN ROUND(COALESCE(R.efePdteImporte, FF.facTotal, 0),2) < ROUND(ISNULL(R.totalCobrado, 0),2) THEN 'PD'
-
-	--CM1: Compensando / Facturas cobradas por el punto de pago compensación
-	--WHEN (R.efePdteCod IS NULL AND ROUND(R.totalCobrado,2) < ROUND(R.facTotal,2)) AND R.ultCobNum IS NOT NULL AND R.facNumCobros = R.facNumCobros_Comp THEN 'CM1' 
-
-	--CM: Compensando / Facturas cobradas por el punto de pago compensación
-	WHEN (R.efePdteCod IS NULL AND ROUND(R.totalCobrado,2) >= ROUND(R.facTotal,2)) AND R.ultCobNum IS NOT NULL AND R.facNumCobros = R.facNumCobros_Comp THEN 'CM' 
-
-	--AN: Anulado/ Facturas anuladas
-	--Además de tener la original rellenos los campos de rectificación la rectificativa tiene importe 0
-	WHEN FF.facNumeroRectif IS NOT NULL AND FF.facImporteRectif = 0 THEN 'AN'
-
-	--TR: Traspasado/Facturas con facEstado = 5
-	WHEN (FF.facEstado = 5) THEN 'TR'
-
-	--CD: Cobro detenido/Facturas con facEstado = 6
-	WHEN (FF.facEstado = 6) THEN 'CD'	
-
-	--CO: Cobrado/ factura cobrada
-	WHEN (R.ultCobNum IS NOT NULL AND R.totalCobrado IS NOT NULL) AND
-	(	--Factura cobrada
-		(R.efePdteCod IS NULL	  AND ROUND(R.totalCobrado,2) >= ROUND(R.facTotal,2))  OR
-		--Efecto pendiente cobrado
-		(R.efePdteCod IS NOT NULL AND ROUND(R.totalCobrado, 2) >= ROUND(R.efePdteImporte,2))
-	) THEN 'CO'
-	
-	--VE: Vencido/ Facturas no cobradas y la fecha de vencimiento se ha cumplido. Prevalece sobre el aplazado
-	WHEN (R.efePdteCod IS NOT NULL AND R.efePdteFecVencimiento <  @ahora) THEN 'VE'
-	WHEN (R.efePdteCod IS NULL AND ISNULL(FF.facFechaVto, FF.facFechaVtoOrig) <  @ahora) THEN 'VE'
-
-	--DE: Devuelto/ Solo cuando la devolución es de banco
-	--Existe un último cobro con importe negativo y con origen devolución
-	WHEN R.ultCobNum IS NOT NULL AND R.ultCobImporte IS NOT NULL AND R.ultCobImporte < 0  AND R.ultCobMpc = @DOMICILIACION THEN  'DE'
-
-	--AP: Aplazado/ cuando la fecha de vencimiento esta rellena y es distinta a la fecha de Vto original
-	WHEN (FF.facFechaVto IS NOT NULL) AND (FF.facFechaVtoOrig IS NOT NULL AND FF.facFechaVto<>FF.facFechaVtoOrig) THEN 'AP'
-	
-	--NO: Notificado/ PENDIENTE de cobrar sin vencer. La fecha vencimiento de la factura no se ha cumplido aun 
-	WHEN (R.efePdteCod IS NOT NULL AND R.efePdteFecVencimiento >=  @ahora) THEN 'NO'
-	WHEN (R.efePdteCod IS NULL AND ISNULL(FF.facFechaVto, FF.facFechaVtoOrig) >= @ahora) THEN 'NO'
-
-	--IM: Impagado/	incobrables ver funcional
-	--CS: Cobrado salvo devolución/	NO SE USA
-	--DC: Dividido por compensación/ NO SE PODRA OBTENER EN ACUAMA
-	ELSE '' END 
-	AS [cobEstado]
-	INTO #EDOCOB
-	FROM #RECIBOCOB AS R
-	LEFT JOIN #FACS AS FF
-	ON R.facCod = FF.facCod
-	AND R.facPerCod = FF.facPerCod
-	AND R.facCtrCod = FF.facCtrCod
-	AND R.facVersion = FF.facVersion;
-
-	--**************
-	--[RR] RESULTADO FINAL:
-	--**************
-
-	--[R1] Filtramos por estado del pago.
-	---- #RESULT: Filtramos las facturas+efectos pendientes por su estado de pago
-	SELECT IDENTITY(INT,1,1) AS ID
-	, R.facCod
-	, R.facPerCod
-	, R.facCtrCod
-	, R.facVersion
-	, R.facNumeroAqua
-	, R.efePdteCod
-	, R.efePdteScd
-	, R.efePdteFecVencimiento
-	, E.cobEstado
-	, E.efePdteImporte
-	, E.totalCobrado
-	, E.ultCobNum
-	INTO #RESULT
-	FROM #RECIBOCOB AS R
-	LEFT JOIN #EDOCOB AS E
-	ON E.facCod = R.facCod
-	AND E.facPerCod = R.facPerCod
-	AND E.facCtrCod = R.facCtrCod
-	AND E.facVersion= R.facVersion
-	AND ((R.efePdteCod IS NULL AND E.efePdteCod IS NULL) OR  R.efePdteCod = E.efePdteCod)
-	AND ((R.efePdteScd IS NULL AND E.efePdteScd IS NULL) OR  R.efePdteScd = E.efePdteScd)
-	WHERE E.cobEstado NOT IN ('CO', 'TR', 'CM','FR')
-	ORDER BY R.facNumeroAqua, R.efePdteCod;
-
-	--********************
-	--[R2]Estados de los contratos
-	CREATE TABLE #EDOCTR(
-	  ctrcod INT	
-	, ctrversion INT	
-	, ctrUsoCod INT
-	, ctrZonCod VARCHAR(4)	
-	, ctrfecini DATETIME
-	, ctrfecanu	DATETIME
-	, esDomiciliado BIT
-	, Estado VARCHAR(1))
-
-	INSERT INTO #EDOCTR
-	EXEC InformesExcel.contratosEstados_EMMASA;
-
-	--**************
-	--[R3] Columnas del resultado relevantes para la salida del informe.
-	---- #REPORT: Filtramos las facturas+efectos pendientes por su estado de pago	
-	SELECT R.ID
-	, R.facCod
-	, R.facPerCod
-	, R.facCtrCod
-	, R.facVersion
-	, R.facNumeroAqua
-	, CAST(R.efePdteCod AS VARCHAR(25)) AS efePdteCod
-	, R.efePdteScd
-	, R.cobEstado
-	, R.efePdteFecVencimiento
-
-	, F.facEstadoEmmasa
-	, F.facFecha
-	, YEAR(F.facFecha) AS Año
+	INSERT INTO #RECIBOS
+	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion
+	, F.ctrTitDocIden
+	, F.cobEstado
 	, F.facTotal
-	, F.facFechaVtoOrig
-	, IIF(F.facFechaVto IS NOT NULL AND F.facFechaVtoOrig IS NOT NULL AND F.facFechaVto<> F.facFechaVtoOrig, F.facFechaVto, NULL) AS facFechaVto
-	, F.facSerCod
-	, S.serdesc
+	, ISNULL(F.TOTAL_COB, 0)
+	, 0
+	, deuda=F.facTotal-F.TOTAL_COB
+	FROM #EDO_FAC AS F
+	WHERE F.cobEstado NOT IN('CO', 'TR', 'CM', 'FR');
 
-	, C.ctrFicticio
-	, ISNULL(C.ctrTitExtCorte, 0) AS ctrTitExtCorte
-	, C.ctrTitDocIden
-	, C.ctrTitNom
-	, CC.Estado AS ctrEstado
-	, C.ctrUsoCod
-	, U.usodes
-	--***************
-	, ultCobNum
-	, COALESCE(R.efePdteImporte, F.facTotal, 0) AS facturado
-	, ISNULL(R.totalCobrado, 0) AS cobrado
-	, COALESCE(R.efePdteImporte, F.facTotal, 0) - ISNULL(R.totalCobrado, 0) AS deuda
-	INTO #REPORT
-	FROM #RESULT AS R
-	LEFT JOIN #FACS AS F
-	ON F.facCod = R.facCod
+	
+
+	SELECT R.*, F.facNumeroAqua 	
+	FROM #RECIBOS AS R
+	LEFT JOIN dbo.facturas AS F
+	ON F.facCtrCod = R.facCtrCod
 	AND F.facPerCod = R.facPerCod
-	AND F.facCtrCod = R.facCtrCod
+	AND F.facCod = R.facCod
 	AND F.facVersion = R.facVersion
-	LEFT JOIN dbo.contratos AS C
-	ON C.ctrcod = F.facCtrCod
-	AND C.ctrversion = F.facCtrVersion
-	LEFT JOIN #EDOCTR AS CC
-	ON CC.ctrcod = C.ctrcod
-	LEFT JOIN dbo.usos AS U
-	ON U.usocod = C.ctrUsoCod
-	LEFT JOIN dbo.series AS S
-	ON S.sercod = F.facSerCod;
+	WHERE R.ctrTitDocIden='P3803800F'
 
-	
-	--********************
-	--DataTable[3]:  Datos
-	--[1/2] Salida para la plantilla del informe
-	SELECT  
-	 ctrTitDocIden AS [NIF]
-	, ctrTitNom AS [Nombre]
-	, facNumeroAqua AS [Factura]
-	, facFecha AS [Fecha Factura]	
-	FROM #REPORT
-	--MUY IMPORTANTE garantizar el orden deterministico en ambas tablas
-	ORDER BY Año, facNumeroAqua, ID;
-
-	--********************
-	--DataTable[4]:  Datos
-	--[2/2] Salida para la plantilla del informe
-	SELECT 
-	--IIF(deuda < 0, 'DEVOLUCION', 'PAGO') AS Tipo
-	--, efePdteCod AS [Efecto Pendiente] 
-	 cobEstado AS [Estado]
-	--, facturado AS [Importe Facturado]
-	, deuda * IIF(cobEstado IS NOT NULL AND cobEstado='PD', 0, 1) AS [Importe PAGO]
-	, deuda * IIF(cobEstado IS NOT NULL AND cobEstado='PD', -1, 0) AS [Importe DEVOLUCION]
-	--, FORMAT(facFecha, 'dd/MM/yyyy') AS [Fecha Creación]
-	--, FORMAT(facFechaVtoOrig, 'dd/MM/yyyy') AS [Fecha VTO. Origen]
-	--, FORMAT(facFechaVto, 'dd/MM/yyyy') AS [Fecha Nuevo VTO]
-	FROM #REPORT
-	--MUY IMPORTANTE garantizar el orden deterministico en ambas tablas
-	ORDER BY Año, facNumeroAqua, ID;
-
-	SELECT 
-	 ctrTitDocIden AS [NIF]
-	, ctrTitNom AS [Nombre]
-	, facNumeroAqua AS [Factura]
-	, facFecha AS [Fecha Factura]	
-	, cobEstado AS [Estado]	
-	, deuda * IIF(cobEstado IS NOT NULL AND cobEstado='PD', 0, 1) AS [Importe PAGO]
-	, deuda * IIF(cobEstado IS NOT NULL AND cobEstado='PD', -1, 0) AS [Importe DEVOLUCION]
-	FROM #REPORT AS R
 	UNION ALL
-	SELECT 
-	NIF,
-	Nombre,
-	Factura,
-	[Fecha Factura],
-	estado,
-	[Importe PAGO],
-	[Importe DEVOLUCION]
-	FROM #ENTREGASCUENTA
-	ORDER BY NIF, [Factura], [Fecha Factura]	
-	*/
-
-	END TRY
+	SELECT facCod=0, facPerCod=0, facCtrCod=0, facVersion=0
+	, E.ctrTitDocIden
+	, cobEstado='PD'
+	, ImporteRecibo=0
+	, Cobrado = EntregasCta
+	, efePdteCod=0
+	, DeudaRecibo = -1*E.EntregasCta
+	, NULL
+	FROM #EC AS E
+	WHERE E.ctrTitDocIden='P3803800F'
+	ORDER BY R.cobEstado;
 	
-	BEGIN CATCH
-		SELECT  @p_errId_out = ERROR_NUMBER()
-			 ,  @p_errMsg_out= ERROR_MESSAGE();
-	END CATCH
 
+	--END TRY
+	
+	--BEGIN CATCH
+	--	SELECT  @p_errId_out = ERROR_NUMBER()
+	--		 ,  @p_errMsg_out= ERROR_MESSAGE();
+	--END CATCH
 
+	DROP TABLE IF EXISTS  #ECTR;
+	DROP TABLE IF EXISTS  #EC;
 	DROP TABLE IF EXISTS  #FACTOTALES;
 	DROP TABLE IF EXISTS  #FACS;
 	DROP TABLE IF EXISTS  #EDO_FAC;
 	DROP TABLE IF EXISTS  #EDO_EPS;
-
 	DROP TABLE IF EXISTS  #COBS;
 	DROP TABLE IF EXISTS  #EPS;
-
+	DROP TABLE IF EXISTS  #RECIBOS;
 
 
 	
-	IF OBJECT_ID('tempdb.dbo.#COBROS', 'U') IS NOT NULL  
-	DROP TABLE dbo.#COBROS;
+	SELECT * FROM facturas WHERE facNumeroAqua IN('PU1500001420','PU1500002636','PU1900006199','PU1700008152')
 
-	IF OBJECT_ID('tempdb.dbo.#RECIBOS', 'U') IS NOT NULL  
-	DROP TABLE dbo.#RECIBOS;
-
-	IF OBJECT_ID('tempdb.dbo.#RECIBOCOB', 'U') IS NOT NULL  
-	DROP TABLE dbo.#RECIBOCOB;
-	
-	IF OBJECT_ID('tempdb.dbo.#EDOCOB', 'U') IS NOT NULL  
-	DROP TABLE dbo.#EDOCOB;
-
-	--***************
-	IF OBJECT_ID('tempdb.dbo.#EDOCTR', 'U') IS NOT NULL  
-	DROP TABLE dbo.#EDOCTR;
-
-	IF OBJECT_ID('tempdb.dbo.#RESULT', 'U') IS NOT NULL  
-	DROP TABLE dbo.#RESULT;
-
-	IF OBJECT_ID('tempdb.dbo.#REPORT', 'U') IS NOT NULL  
-	DROP TABLE dbo.#REPORT;
-
-	IF OBJECT_ID('tempdb.dbo.#ENTREGAPORNIF', 'U') IS NOT NULL  
-	DROP TABLE dbo.#ENTREGAPORNIF;
-
-	IF OBJECT_ID('tempdb.dbo.#ENTREGASCUENTA', 'U') IS NOT NULL  
-	DROP TABLE dbo.#ENTREGASCUENTA;
-	
-
-
-GO
+	SELECT * FROM contratos WHERE ctrcod=50888
+--110428025;110428051;110499893;50888
+--UPDATE U SET usrfpass	= GETDATE(), usrpass1='', usrpass2='', usrpass3=''
+--, usrpass='XNF4R1B11mppeeKkP4VvA9THE+k1oHVHMEjE+6jBLw8MBIZI0+PDgOVw+7at04rtl0jErzjB/xx74lQwagl2CQ==' 
+--FROM Usuarios AS U WHERE usrcod='gmdesousa'
 
 
