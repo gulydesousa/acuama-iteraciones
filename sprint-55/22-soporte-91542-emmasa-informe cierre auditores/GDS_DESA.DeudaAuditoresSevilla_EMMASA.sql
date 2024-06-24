@@ -114,7 +114,7 @@ AS
 
 	SET @sql = N'CREATE CLUSTERED INDEX IDX_' + REPLACE(CONVERT(NVARCHAR(50), NEWID()), '-', '') + ' ON #FACTOTALES(ftfFacCod, ftfFacPerCod, ftfFacCtrCod, ftfFacVersion)';
 	EXEC sp_executesql @sql;
-
+	
 	--**************
 	--[01]FACTURAS: Sacamos las facturas que por fechas son las que conformarían el reporte
 	-- #FACS: Filtramos las facturas que van para el informe
@@ -131,6 +131,7 @@ AS
 	, F.facFechaRectif
 	, F.facNumeroRectif
 	, F.facSerieRectif
+	, _facFechaVto = ISNULL(F.facFechaVto, F.facFechaVtoOrig)
 	--**********************
 	, facTotal = ISNULL(FT.ftfImporte, 0)
 	, facImporteRectif =  CAST(NULL AS MONEY)
@@ -154,12 +155,14 @@ AS
 	ON  (P.fechaD IS NULL OR F.facFecha >= P.fechaD) 
 	AND (P.fechaH IS NULL OR F.facFecha < P.fechaH)
 
-	AND facCtrCod=110139360
 	WHERE F.facNumero IS NOT NULL	--Se excluyen las prefacturas
 	AND F.facEstado NOT IN (4,5);	--Se excluyen las (4) AGRUPADAS NI (5) TRASPASADAS. No es deuda 	
 
 	SET @sql = N'CREATE CLUSTERED INDEX IDX_' + REPLACE(CONVERT(NVARCHAR(50), NEWID()), '-', '') + ' ON #FACS(facCod, facPerCod, facCtrCod, facVersion)';
 	EXEC sp_executesql @sql;	
+	
+	--*** DEBUG ***
+	--SELECT * FROM #FACS;
 	
 	
 	--**********************
@@ -229,7 +232,9 @@ AS
 	AND F.facCtrCod = FT.facCtrCod
 	AND F.facVersion = FT.facVersion;
 
-
+	--**** DEBUG *****
+	--SELECT * FROM #FACS;
+	
 
 	--**************
 	--[05]Borramos de la tabla #FACS las que no nos interesan, por su estado, para sacar el informe
@@ -243,22 +248,46 @@ AS
 	OR F.facFechaRectif IS NOT NULL;
 
 
+	--**** DEBUG *****
 	SELECT * FROM #FACS;
-
-	/*	
-	
-	
-	
 	
 	--**************
-	--[11]Totalizamos los cobros por FACTURA
-	---- #COBROS
-	WITH FCOBROS AS(
+	--[20]Recuperamos los Efectos pendientes de las facturas:
+	--Efectos Pendientes
+	SELECT F.facCod
+	, F.facCtrCod
+	, F.facPerCod
+	, EP.efePdteCod
+	, EP.efePdteScd
+	, EP.efePdteImporte
+	, EP.efePdteFecVencimiento
+	--Totalización de los efectos pendientes por factura
+	, TOTAL_EPS = SUM(EP.efePdteImporte) OVER(PARTITION BY F.facCod, F.facCtrCod, F.facPerCod)
+	--CN_EP = Efectos pendientes por factura
+	, CN_EP = COUNT(EP.efePdteCod) OVER(PARTITION BY F.facCod, F.facCtrCod, F.facPerCod)
+	--RN_EP=1 : Ultimo efecto pendiente por factura
+	, RN_EP = ROW_NUMBER() OVER(PARTITION BY F.facCod, F.facCtrCod, F.facPerCod ORDER BY EP.efePdteCod DESC)
+	INTO #EPS
+	FROM #FACS AS F
+	INNER JOIN dbo.efectosPendientes AS EP
+	ON EP.efePdteFacCod = F.facCod
+	AND EP.efePdtePerCod = F.facPerCod
+	AND EP.efePdteCtrCod = F.facCtrCod
+	AND EP.efePdteFecRechazado IS NULL
+	AND F.RN_FAC=1;
+
+	--**** DEBUG *****
+	--SELECT * FROM #EPS;
+
+	
+	--**************
+	--[30]Totalizamos los cobros por FACTURA (sin version)
+	--Para calcular el estado del pago necesitamos detalles del total de los cobros asi como el último cobro 
+	-- #COBROS
 	SELECT F.facCod 
 	, F.facPerCod
 	, F.facCtrCod
 	, F.facVersion
-	, F.facCtrVersion
 	, CB.cobScd
 	, CB.cobPpag
 	, CB.cobNum
@@ -267,226 +296,92 @@ AS
 	, CB.cobOrigen
 	, CBL.cblLin
 	, CBL.cblImporte
-	--RN=1: Cobro mas reciente
-	, ROW_NUMBER() OVER (PARTITION BY F.facCod , F.facPerCod, F.facCtrCod, F.facVersion ORDER BY CB.cobFec DESC) AS RN
-	FROM  #FACS AS F
+	--CN_COB: Número de cobros de compensación por factura
+	, CN_COB_COMP = SUM(IIF(CB.cobMpc=@COMPENSACION, 1, 0)) OVER (PARTITION BY F.facCod , F.facPerCod, F.facCtrCod)
+	--CN_COB: Número de cobros por factura
+	, CN_COB = COUNT(CB.cobNum) OVER (PARTITION BY F.facCod , F.facPerCod, F.facCtrCod)
+	--RN_COB=1: Cobro mas reciente
+	, RN_COB = ROW_NUMBER() OVER (PARTITION BY F.facCod , F.facPerCod, F.facCtrCod ORDER BY CB.cobFec DESC, CB.cobfecReg DESC)
+	--TOTAL_COB: Total cobrado por factura
+	, TOTAL_COB = SUM(CBL.cblImporte) OVER (PARTITION BY F.facCod , F.facPerCod, F.facCtrCod)
+	-- Efecto pendiente asociado si es el caso
+	, CLEP.clefePdteFacCod
+	, CLEP.clefePdteCtrCod
+	, CLEP.clefePdtePerCod
+	, CLEP.cleCblScd
+	, CLEP.clefePdteCod
+
+	INTO #COBS
+	FROM  #FACS AS F	
 	INNER JOIN dbo.cobros AS CB
-	ON CB.cobCtr = F.facCtrCod
+	ON F.RN_FAC = 1 --RN_FAC=1: Ultima vesión de la factura
+	AND CB.cobCtr = F.facCtrCod	
 	INNER JOIN dbo.coblin AS CBL
-	ON CB.cobScd = CBL.cblScd
+	ON  CB.cobScd = CBL.cblScd
 	AND CB.cobPpag = CBL.cblPpag
 	AND CB.cobNum = CBL.cblNum
 	AND CBL.cblFacCod = F.facCod
-	AND CBL.cblFacVersion = F.facVersion
-	AND CBL.cblPer = F.facPerCod)
+	AND CBL.cblPer = F.facPerCod
+	LEFT JOIN dbo.cobLinEfectosPendientes AS CLEP
+	ON  CLEP.cleCblScd = CBL.cblScd
+	AND CLEP.cleCblPpag = CBL.cblPpag
+	AND CLEP.cleCblNum = CBL.cblNum
+	AND CLEP.cleCblLin = CBL.cblLin;
 	
-	SELECT * INTO #COBROS 
-	FROM FCOBROS;
 
-	--**************
-	--[21]Recuperamos los RECIBOS: Facturas + Efectos pendienes de esas facturas:
-	---- #RECIBOS: Recibos son las facturas como cabecera y sus efectos pendientes
-	WITH RECIBOS AS(
-	--Facturas
-	SELECT F.facCod
-	, F.facCtrCod
-	, F.facPerCod
-	, F.facVersion 
-	, F.facCtrVersion
-	, F.facClicod
+
+	--[40] Facturas
+	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facNumeroAqua
+	--, F.facEstado, F.facEstadoEmmasa
 	, F.facTotal
-	, F.facNumeroAqua
-	, F.RN
-	, NULL AS efePdteCod
-	, NULL AS efePdteScd
-	, NULL AS efePdteImporte
-	, NULL AS efePdteFecVencimiento
-	FROM #FACS AS F)
+	, EPS.TOTAL_EPS --Totalizacion de los efectos pendientes
+	, C.TOTAL_COB	--Total cobrado por factura
+	, C.CN_COB		--Numero de cobros
+	, C.CN_COB_COMP --Numero de cobros por compensación
+	, EPS.CN_EP		--Numero de efectos pendientes por factura
+	--********************
+	--FACTURA ESTADO PAGO
+	--********************
+	, [cobEstado] = CASE 
+	--FR: Fraccionado/ una factura con efectos pendientes
+	WHEN  EPS.CN_EP IS NOT NULL AND EPS.CN_EP>0 THEN 'FR'
+	--PD: Si el importe deuda es negativo (Pendiente devolución)
+	WHEN ROUND(ISNULL(C.TOTAL_COB, 0), 2) > F.facTotal  THEN 'PD' 
+	--CM: Compensando / Facturas cobradas por el punto de pago compensación
+	WHEN ROUND(ISNULL(C.TOTAL_COB, 0), 2) >= F.facTotal AND C.CN_COB IS NOT NULL AND C.CN_COB > 0 AND C.CN_COB = C.CN_COB_COMP THEN 'CM' 
+	--AN: Anulado/ Facturas anuladas
+	--Además de tener la original rellenos los campos de rectificación la rectificativa tiene importe 0
+	WHEN F.facNumeroRectif IS NOT NULL AND F.facImporteRectif = 0 THEN 'AN'
+	--TR: Traspasado/Facturas con facEstado = 5
+	WHEN (F.facEstado = 5) THEN 'TR'
+	--CD: Cobro detenido/Facturas con facEstado = 6
+	WHEN (F.facEstado = 6) THEN 'CD'
+	--CO: Cobrado/ factura cobrada
+	WHEN ROUND(ISNULL(C.TOTAL_COB, 0), 2) = F.facTotal THEN 'CO'
+	--VE: Vencido/ Facturas no cobradas y la fecha de vencimiento se ha cumplido. Prevalece sobre el aplazado
+	WHEN F._facFechaVto <  @ahora THEN 'VE'
+	ELSE '' END
 
-	--Facturas
-	SELECT * 
-	INTO #RECIBOS
-	FROM RECIBOS
+	FROM #FACS AS F
+	LEFT JOIN #COBS AS C
+	ON F.RN_FAC=1  --Ultima version de la factura
+	AND C.RN_COB=1 --Ultimo cobro de esta factura
+	AND F.facCod = C.facCod
+	AND F.facPerCod = C.facPerCod
+	AND F.facCtrCod = C.facCtrCod
+	LEFT JOIN #EPS AS EPS
+	ON  EPS.facCod = F.facCod
+	AND EPS.facCtrCod = F.facCtrCod
+	AND EPS.facPerCod = F.facPerCod
+	AND EPS.RN_EP = 1 --Ultimo efecto pendiente
 	
-	UNION ALL
-	--Efectos Pendientes
-	SELECT R.facCod
-	, R.facCtrCod
-	, R.facPerCod
-	, R.facVersion
-	, R.facCtrVersion
-	, R.facClicod
-	, R.facTotal
-	, R.facNumeroAqua
-	, R.RN
-	, EP.efePdteCod
-	, EP.efePdteScd
-	, EP.efePdteImporte
-	, EP.efePdteFecVencimiento
-	FROM RECIBOS AS R
-	INNER JOIN dbo.efectosPendientes AS EP
-	ON EP.efePdteFacCod = R.facCod
-	AND EP.efePdtePerCod = R.facPerCod
-	AND EP.efePdteCtrCod = R.facCtrCod
-	AND EP.efePdteFecRechazado IS NULL
-	AND R.RN=1;
 
-	--**************
-	--[31]Para calcular el estado del pago necesitamos detalles del total de los cobros asi como el último cobro 
-	---- #RECIBOCOB: Tabla donde guardamos los totales de los cobros por RECIBOS
-	--Lo haremos en dos partes. Primero totalizamos por factura:
-	--TOTAL COBROS
-	WITH TCOBS AS(
-	SELECT C.facCod
-	, C.facPerCod
-	, C.facCtrCod
-	, C.facVersion
-	, COUNT(C.cobNum) AS facNumCobros
-	, SUM(IIF(C.cobMpc=@COMPENSACION, 1, 0)) AS facNumCobros_Comp
-	, SUM(C.cblImporte)  AS totalCobrado
-	FROM #COBROS AS C
-	GROUP BY C.facCod
-	, C.facPerCod
-	, C.facCtrCod
-	, C.facVersion
+	SELECT * FROM #FACS WHERE facNumeroRectif IS NOT NULL;
 	
-	--ULTIMO COBRO
-	), UCOBS AS(
-	SELECT C.facCod
-	, C.facPerCod
-	, C.facCtrCod
-	, C.facVersion
-	, C.cblImporte
-	, C.cobMpc
-	, C.cobNum
-	FROM #COBROS AS C
-	WHERE C.RN=1 )
+	/*
+
 	
-	--**************
-	--[31.1]Cobros por FACTURA (efePdteCod IS NULL)
-	SELECT R.facCod
-	, R.facPerCod
-	, R.facCtrCod
-	, R.facVersion
-	, R.facCtrVersion
-	, R.facClicod
-	, R.facNumeroAqua
-	, R.efePdteCod
-	, R.efePdteScd
-	, R.efePdteImporte
-	, R.efePdteFecVencimiento
-	, R.facTotal
-	, C.totalCobrado
-	, C.facNumCobros
-	, C.facNumCobros_Comp
-	, UC.cobNum AS ultCobNum
-	, UC.cblImporte AS ultCobImporte
-	, UC.cobMpc AS ultCobMpc
-	, SUM(R.efePdteImporte) OVER (PARTITION BY R.facCod, R.facPerCod, R.facCtrCod, R.facVersion) AS efePdteTotal
-	, COUNT(R.efePdteCod) OVER (PARTITION BY R.facCod, R.facPerCod, R.facCtrCod, R.facVersion) AS efePdtes
-	INTO #RECIBOCOB
-	FROM #RECIBOS AS R
-	LEFT JOIN TCOBS AS C
-	ON  R.efePdteCod IS NULL
-	AND C.facCod = R.facCod
-	AND C.facPerCod = R.facPerCod
-	AND C.facCtrCod = R.facCtrCod
-	--AND C.facVersion = R.facVersion
-	LEFT JOIN UCOBS AS UC
-	ON  UC.facCod = C.facCod
-	AND UC.facPerCod = C.facPerCod
-	AND UC.facCtrCod = C.facCtrCod
-	AND UC.facVersion = C.facVersion;
-
-	--**************
-	--[31.2]Cobros por Efectos pendiente (efePdteCod IS  NOT NULL)
-	---- #RECIBOCOB: Tabla donde guardamos los totales de los cobros por RECIBOS
-	-- Este lo hacemos con un update sobre la tabla creada en la sentencia anterior.
-	-- Cobros para los efectos pendientes
-	WITH EPCOBS AS(
-	SELECT R.facCod
-	, R.facPerCod
-	, R.facCtrCod
-	, R.facVersion
-	, R.efePdteCod
-	, R.efePdteScd
-	, R.efePdteImporte
-	, CB.cobNum
-	, CBL.cblNum
-	, CB.cobMpc
-	, IIF (CBL.cblImporte >  R.efePdteImporte, R.efePdteImporte, CBL.cblImporte) as cblImporte
-	, ROW_NUMBER() OVER (PARTITION BY R.facCod, R.facPerCod, R.facCtrCod, R.facVersion, R.efePdteCod ORDER BY CB.cobFec DESC) AS RN
-	FROM #RECIBOS AS R
-	INNER JOIN dbo.cobLinEfectosPendientes AS C
-	ON C.clefePdteCod = R.efePdteCod
-	AND C.clefePdteScd = R.efePdteScd
-	AND C.clefePdteFacCod = R.facCod
-	AND C.clefePdtePerCod = R.facPerCod
-	AND C.clefePdteCtrCod = R.facCtrCod
-	INNER JOIN dbo.cobLin AS CBL
-	ON C.cleCblScd = CBL.cblScd
-	AND C.cleCblPpag = CBL.cblPpag
-	AND C.cleCblNum = CBL.cblNum
-	AND C.cleCblLin = CBL.cblLin
-	INNER JOIN dbo.cobros AS CB
-	ON CB.cobScd = CBL.cblScd
-	AND CB.cobPpag = CBL.cblPpag
-	AND CB.cobNum = CBL.cblNum
 	
-	--TOTAL COBROS
-	), TCOBS AS(
-	SELECT R.facCod
-	, R.facPerCod
-	, R.facCtrCod
-	, R.facVersion
-	, R.efePdteCod
-	, R.efePdteScd
-	, COUNT(R.cblNum) AS facNumCobros
-	, SUM(IIF(R.cobMpc=@COMPENSACION, 1, 0)) AS facNumCobros_Comp
-	, SUM(IIF(R.cblImporte > R.efePdteImporte, R.efePdteImporte,  R.cblImporte)) AS totalCobrado 
-	FROM EPCOBS AS R
-	GROUP BY R.facCod
-	, R.facPerCod
-	, R.facCtrCod
-	, R.facVersion
-	, R.efePdteCod
-	, R.efePdteScd
-
-	--ULTIMO COBRO
-	), UCOBS AS(
-	SELECT C.facCod
-	, C.facPerCod
-	, C.facCtrCod
-	, C.facVersion
-	, C.efePdteCod
-	, C.efePdteScd
-	, IIF(C.cblImporte > C.efePdteImporte, C.efePdteImporte,  C.cblImporte) AS cblImporte
-	, C.cobMpc
-	, C.cobNum
-	FROM  EPCOBS AS C
-	WHERE C.RN=1 )
-
-	UPDATE R SET 
-	  R.totalCobrado = C.totalCobrado
-	, R.facNumCobros = C.facNumCobros
-	, R.facNumCobros_Comp = C.facNumCobros_Comp
-	, R.ultCobNum = UC.cobNum  
-	, R.ultCobImporte = UC.cblImporte
-	, R.ultCobMpc = UC.cobMpc
-	FROM #RECIBOCOB AS R
-	INNER JOIN TCOBS AS C
-	ON  C.facCod = R.facCod
-	AND C.facPerCod = R.facPerCod
-	AND C.facCtrCod = R.facCtrCod
-	AND C.facVersion = R.facVersion
-	AND C.efePdteCod = R.efePdteCod
-	AND C.efePdteScd = R.efePdteScd
-	LEFT JOIN UCOBS AS UC
-	ON  UC.facCod = C.facCod
-	AND UC.facPerCod = C.facPerCod
-	AND UC.facCtrCod = C.facCtrCod
-	AND UC.facVersion = C.facVersion
-	AND UC.efePdteCod = C.efePdteCod
 
 	--**************
 	--[41] Finalmente tenemos todo para calcular el ESTADO DE LOS PAGOS.
@@ -669,7 +564,7 @@ AS
 	LEFT JOIN dbo.series AS S
 	ON S.sercod = F.facSerCod;
 
-	/*
+	
 	--********************
 	--DataTable[3]:  Datos
 	--[1/2] Salida para la plantilla del informe
@@ -698,7 +593,6 @@ AS
 	FROM #REPORT
 	--MUY IMPORTANTE garantizar el orden deterministico en ambas tablas
 	ORDER BY Año, facNumeroAqua, ID;
-	*/
 
 	SELECT 
 	 ctrTitDocIden AS [NIF]
@@ -730,8 +624,10 @@ AS
 	END CATCH
 
 
-	IF OBJECT_ID('tempdb.dbo.#FACS', 'U') IS NOT NULL DROP TABLE dbo.#FACS;
-	IF OBJECT_ID('tempdb.dbo.#FACTOTALES', 'U') IS NOT NULL DROP TABLE dbo.#FACTOTALES;
+	DROP TABLE IF EXISTS  #FACS;
+	DROP TABLE IF EXISTS  #FACTOTALES;
+	DROP TABLE IF EXISTS  #COBS;
+	DROP TABLE IF EXISTS  #EPS;
 
 
 
