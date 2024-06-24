@@ -131,7 +131,8 @@ AS
 	, F.facFechaRectif
 	, F.facNumeroRectif
 	, F.facSerieRectif
-	, _facFechaVto = ISNULL(F.facFechaVto, F.facFechaVtoOrig)
+	, F.facFechaVto
+	, F.facFechaVtoOrig
 	--**********************
 	, facTotal = ISNULL(FT.ftfImporte, 0)
 	, facImporteRectif =  CAST(NULL AS MONEY)
@@ -257,6 +258,14 @@ AS
 	SELECT F.facCod
 	, F.facCtrCod
 	, F.facPerCod
+	, F.facVersion
+	, F.facNumeroAqua
+	, F.facEstado
+	, F.facEstadoEmmasa
+	, F.facNumeroRectif
+	, F.facImporteRectif
+	, F.facFechaVto
+	, F.facFechaVtoOrig
 	, EP.efePdteCod
 	, EP.efePdteScd
 	, EP.efePdteImporte
@@ -310,7 +319,12 @@ AS
 	, CLEP.clefePdtePerCod
 	, CLEP.cleCblScd
 	, CLEP.clefePdteCod
-
+	--TOTAL_COB: Total cobrado por efecto pendiente
+	, TOTAL_EPCOB = SUM(CBL.cblImporte) OVER (PARTITION BY F.facCod , F.facPerCod, F.facCtrCod, CLEP.clefePdteCod)
+	--RN_EPCOB=1: Cobro mas reciente por efecto pendiente
+	, RN_EPCOB = ROW_NUMBER() OVER (PARTITION BY F.facCod , F.facPerCod, F.facCtrCod, CLEP.clefePdteCod ORDER BY CB.cobFec DESC, CB.cobfecReg DESC)
+	--CN_EPCOB: Número de cobros por efectos pendientes
+	, CN_EPCOB = COUNT(CB.cobNum) OVER (PARTITION BY F.facCod , F.facPerCod, F.facCtrCod, CLEP.clefePdteCod)
 	INTO #COBS
 	FROM  #FACS AS F	
 	INNER JOIN dbo.cobros AS CB
@@ -331,8 +345,8 @@ AS
 
 
 	--[40] Facturas
-	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facNumeroAqua
-	--, F.facEstado, F.facEstadoEmmasa
+	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion, F.facNumeroAqua
+	, F.facEstado, F.facEstadoEmmasa
 	, F.facTotal
 	, EPS.TOTAL_EPS --Totalizacion de los efectos pendientes
 	, C.TOTAL_COB	--Total cobrado por factura
@@ -345,10 +359,10 @@ AS
 	, [cobEstado] = CASE 
 	--FR: Fraccionado/ una factura con efectos pendientes
 	WHEN  EPS.CN_EP IS NOT NULL AND EPS.CN_EP>0 THEN 'FR'
-	--PD: Si el importe deuda es negativo (Pendiente devolución)
+	--PD: Si el importe cobrado supera el importe total de la factura (Pendiente devolución)
 	WHEN ROUND(ISNULL(C.TOTAL_COB, 0), 2) > F.facTotal  THEN 'PD' 
-	--CM: Compensando / Facturas cobradas por el punto de pago compensación
-	WHEN ROUND(ISNULL(C.TOTAL_COB, 0), 2) >= F.facTotal AND C.CN_COB IS NOT NULL AND C.CN_COB > 0 AND C.CN_COB = C.CN_COB_COMP THEN 'CM' 
+	--CM: Compensando / Facturas cobradas por el punto de pago compensación (todos los cobros son por compensación)
+	WHEN ROUND(ISNULL(C.TOTAL_COB, 0), 2) = F.facTotal AND C.CN_COB IS NOT NULL AND C.CN_COB > 0 AND C.CN_COB = C.CN_COB_COMP THEN 'CM' 
 	--AN: Anulado/ Facturas anuladas
 	--Además de tener la original rellenos los campos de rectificación la rectificativa tiene importe 0
 	WHEN F.facNumeroRectif IS NOT NULL AND F.facImporteRectif = 0 THEN 'AN'
@@ -359,9 +373,16 @@ AS
 	--CO: Cobrado/ factura cobrada
 	WHEN ROUND(ISNULL(C.TOTAL_COB, 0), 2) = F.facTotal THEN 'CO'
 	--VE: Vencido/ Facturas no cobradas y la fecha de vencimiento se ha cumplido. Prevalece sobre el aplazado
-	WHEN F._facFechaVto <  @ahora THEN 'VE'
+	WHEN ISNULL(F.facFechaVto, F.facFechaVtoOrig) <  @ahora THEN 'VE'
+	--DE: Devuelto/ Solo cuando la devolución es de banco
+	--Existe un último cobro con importe negativo y con origen devolución
+	WHEN C.CN_COB IS NOT NULL AND C.CN_COB > 0 AND C.cblImporte IS NOT NULL AND C.cblImporte  < 0  AND C.cobMpc = @DOMICILIACION THEN  'DE'
+	--AP: Aplazado/ cuando la fecha de vencimiento esta rellena y es distinta a la fecha de Vto original
+	WHEN (F.facFechaVto IS NOT NULL) AND (F.facFechaVtoOrig IS NOT NULL AND F.facFechaVto<>F.facFechaVtoOrig) THEN 'AP'
+	--NO: Notificado/ PENDIENTE de cobrar sin vencer. La fecha vencimiento de la factura no se ha cumplido aun 
+	WHEN (ISNULL(F.facFechaVto, F.facFechaVtoOrig) >= @ahora) THEN 'NO'	
 	ELSE '' END
-
+	INTO #EDO_FAC
 	FROM #FACS AS F
 	LEFT JOIN #COBS AS C
 	ON F.RN_FAC=1  --Ultima version de la factura
@@ -373,10 +394,57 @@ AS
 	ON  EPS.facCod = F.facCod
 	AND EPS.facCtrCod = F.facCtrCod
 	AND EPS.facPerCod = F.facPerCod
-	AND EPS.RN_EP = 1 --Ultimo efecto pendiente
+	AND EPS.RN_EP = 1; --Ultimo efecto pendiente
+
+
+	--[50] Efectos Pendientes
+	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion, F.facNumeroAqua
+	, F.facEstado, F.facEstadoEmmasa
+	, F.efePdteImporte
+	, TOTAL_EPS = NULL	--Totalizacion de los efectos pendientes
+	, C.TOTAL_EPCOB		--Total cobrado por efecto pendiente
+	, C.CN_EPCOB		--Numero de cobros por efecto pendiente
+	, CN_COB_COMP=NULL	--Numero de cobros por compensación
+	, CN_EP=NULL		--Numero de efectos pendientes por factura
+	--********************
+	--FACTURA ESTADO PAGO
+	--********************
+	, [cobEstado] = CASE 
+	--PD: Si el importe cobrado supera el importe total del efecto pendiente (Pendiente devolución)
+	WHEN ROUND(ISNULL(C.TOTAL_EPCOB, 0), 2) > F.efePdteImporte  THEN 'PD' 
+	--AN: Anulado/ Facturas anuladas
+	--Además de tener la original rellenos los campos de rectificación la rectificativa tiene importe 0
+	WHEN F.facNumeroRectif IS NOT NULL AND F.facImporteRectif = 0 THEN 'AN'	
+	--TR: Traspasado/Facturas con facEstado = 5
+	WHEN (F.facEstado = 5) THEN 'TR'
+	--CD: Cobro detenido/Facturas con facEstado = 6
+	WHEN (F.facEstado = 6) THEN 'CD'
+	--CO: Cobrado/ factura cobrada
+	WHEN ROUND(ISNULL(C.TOTAL_EPCOB, 0), 2) = F.efePdteImporte THEN 'CO'
+	--VE: Vencido/ Facturas no cobradas y la fecha de vencimiento se ha cumplido. Prevalece sobre el aplazado
+	WHEN F.efePdteFecVencimiento <  @ahora THEN 'VE'	
+	--DE: Devuelto/ Solo cuando la devolución es de banco
+	--Existe un último cobro con importe negativo y con origen devolución
+	WHEN C.CN_COB IS NOT NULL AND C.CN_COB > 0 AND C.cblImporte IS NOT NULL AND C.cblImporte  < 0  AND C.cobMpc = @DOMICILIACION THEN  'DE'
+	--AP: Aplazado/ cuando la fecha de vencimiento esta rellena y es distinta a la fecha de Vto original
+	WHEN F.facFechaVto IS NOT NULL AND F.facFechaVtoOrig IS NOT NULL AND F.facFechaVto<>F.facFechaVtoOrig THEN 'AP'
+	--NO: Notificado/ PENDIENTE de cobrar sin vencer. La fecha vencimiento de la factura no se ha cumplido aun 
+	WHEN F.efePdteFecVencimiento >=  @ahora THEN 'NO'
+	ELSE '' END
+	INTO #EDO_EPS
+	FROM #EPS AS F	
+	LEFT JOIN #COBS AS C
+	ON  C.RN_EPCOB=1 --Ultimo cobro por efecto pendiente
+	AND F.facCod = C.facCod
+	AND F.facPerCod = C.facPerCod
+	AND F.facCtrCod = C.facCtrCod
+	AND F.efePdteCod = C.clefePdteCod;
+	
 	
 
-	SELECT * FROM #FACS WHERE facNumeroRectif IS NOT NULL;
+
+
+	--SELECT * FROM #FACS WHERE facNumeroRectif IS NOT NULL;
 	
 	/*
 
@@ -624,8 +692,11 @@ AS
 	END CATCH
 
 
-	DROP TABLE IF EXISTS  #FACS;
 	DROP TABLE IF EXISTS  #FACTOTALES;
+	DROP TABLE IF EXISTS  #FACS;
+	DROP TABLE IF EXISTS  #EDO_FAC;
+	DROP TABLE IF EXISTS  #EDO_EPS;
+
 	DROP TABLE IF EXISTS  #COBS;
 	DROP TABLE IF EXISTS  #EPS;
 

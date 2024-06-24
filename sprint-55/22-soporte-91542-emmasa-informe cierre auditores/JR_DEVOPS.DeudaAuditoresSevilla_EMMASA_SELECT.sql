@@ -156,7 +156,7 @@ AS
 	(P.fechaH IS NULL OR F.facFecha < P.fechaH)
 	)
 
-	AND facCtrCod=110139360
+	AND facCtrCod=110068111
 	)
 
 	SELECT * INTO #FACS 
@@ -323,7 +323,7 @@ AS
 	OR F.facFechaRectif IS NOT NULL;
 
 
-	SELECT * FROM #FACS;
+	SELECT * FROM #FACS WHERE facNumeroAqua='RE2000002912';
 	
 	--**************
 	--[11]Totalizamos los cobros por FACTURA
@@ -646,6 +646,8 @@ AS
 	AND R.facCtrCod = FF.facCtrCod
 	AND R.facVersion = FF.facVersion;
 
+
+	SELECT * FROM #EDOCOB WHERE facNumeroAqua='RE2000002912'
 	--**************
 	--[RR] RESULTADO FINAL:
 	--**************
