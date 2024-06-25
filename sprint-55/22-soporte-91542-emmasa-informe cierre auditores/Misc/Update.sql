@@ -1,5 +1,3 @@
-
-
 --facEstado: cFacturaBO.EEstados
 --CobroBloqueado = 6
 --SinDeterminar = 0
@@ -14,18 +12,6 @@ AND facVersion=2
 AND facFechaRectif IS NULL 
 AND facEstado<>0 
 
-SELECT * FROM contratos WHERE ctrcod='110139360'
-
-SELECT * FROM ExcelConsultas WHERE ExcDescLarga LIKE '%Deuda%'
---[dbo].[Excel_ExcelConsultas.DeudaAuditoresSevilla_EMMASA] -319
---[dbo].[Excel_Excelconsultas.DeudaTipoFactura_EMMASA] - 321
-
-SELECT DISTINCT ExPrfMenuid FROM ExcelPerfil where ExPCod IN ('319', '321')
-
-SELECT * FROM menu WHERE menuid=3
-
-
-SELECT * From facturas WHERE facNumero='2112002211'
 
 
 

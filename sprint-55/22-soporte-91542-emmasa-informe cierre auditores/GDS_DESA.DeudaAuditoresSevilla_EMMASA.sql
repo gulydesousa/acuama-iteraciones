@@ -1,3 +1,5 @@
+DECLARE @NIF VARCHAR(10) = '45708324X';
+
 DECLARE @p_params NVARCHAR(MAX);
 DECLARE @p_errId_out INT;
 DECLARE @p_errMsg_out NVARCHAR(2048);
@@ -91,7 +93,7 @@ AS
 	HAVING SUM(CL.cblImporte)<>0;
 	
 	--*** DEBUG ****
-	--SELECT * FROM #ECTR WHERE ctrTitDocIden='P3803800F';
+	SELECT * FROM #ECTR WHERE ctrTitDocIden=@NIF;
 
 	--[02]Entregas a cuenta: pendientes por titular
 	SELECT ctrTitDocIden
@@ -99,6 +101,11 @@ AS
 	INTO #EC
 	FROM #ECTR AS C
 	GROUP BY ctrTitDocIden;
+
+		
+	--*** DEBUG ****
+	SELECT * FROM #EC WHERE ctrTitDocIden=@NIF;
+
 
 	--**************
 	--[10]TOTAL FACTURAS: Sacamos las facturas que por fechas son las que conformarían el reporte
@@ -157,14 +164,14 @@ AS
 	AND (P.fechaH IS NULL OR F.facFecha < P.fechaH)
 
 	WHERE F.facNumero IS NOT NULL	--Se excluyen las prefacturas
-	AND F.facEstado NOT IN (4,5)	--Se excluyen las (4) AGRUPADAS NI (5) TRASPASADAS. No es deuda 	
-	AND ctrTitDocIden='P3803800F';
+	AND F.facEstado NOT IN (4,5)	--Se excluyen las (4) AGRUPADAS NI (5) TRASPASADAS-TR-. No es deuda 	
+	AND ctrTitDocIden=@NIF;
 
 	SET @sql = N'CREATE CLUSTERED INDEX IDX_' + REPLACE(CONVERT(NVARCHAR(50), NEWID()), '-', '') + ' ON #FACS(facCod, facPerCod, facCtrCod, facVersion)';
 	EXEC sp_executesql @sql;	
 	
 	--*** DEBUG ***
-	--SELECT * FROM #FACS;
+	--SELECT * FROM #FACS WHERE ctrTitDocIden=@NIF;
 		
 	--**********************
 	--[12]RECTIFICATIVAS: Para saber las "Anuladas", tenemos que calcular el importe de las facturas rectificativas
@@ -243,13 +250,13 @@ AS
 	FROM #FACS AS F
 	WHERE F.facTotal IS NULL 
 	OR F.facTotal = 0
-	OR F.facNumero IS NULL	--PREFACTURAS
+	OR F.facNumero IS NULL	 --PREFACTURAS
 	OR F.facEstadoEmmasa='N' --ANULADAS
-	OR F.facFechaRectif IS NOT NULL;
+	OR F.facFechaRectif IS NOT NULL; --Se omiten en consecuencia las Anuladas-AN-
 
 
 	--**** DEBUG *****
-	--SELECT * FROM #FACS;
+	SELECT * FROM #FACS WHERE ctrTitDocIden=@NIF ORDER BY facPerCod;
 	
 	--**************
 	--[20]Recuperamos los Efectos pendientes de las facturas:
@@ -279,7 +286,7 @@ AS
 	AND F.RN_FAC=1;
 
 	--**** DEBUG *****
-	--SELECT * FROM #EPS;
+	SELECT * FROM #EPS;
 
 	
 	--**************
@@ -336,10 +343,11 @@ AS
 	AND CLEP.cleCblLin = CBL.cblLin;
 	
 	--**** DEBUG *****
-	--SELECT * FROM #COBS;
+	SELECT * FROM #COBS ORDER BY facCtrCod, facPerCod, RN_COB;
+	
 	
 	--[41] Estado: Facturas
-	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion
+	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion, F.facNumeroAqua
 	, F.facTotal
 	, F.ctrTitDocIden
 	, EPS.TOTAL_EPS --Totalizacion de los efectos pendientes
@@ -386,10 +394,10 @@ AS
 	AND EPS.RN_EP = 1; --Ultimo efecto pendiente
 	
 	--***DEBUG***
-	--SELECT * FROM #EDO_FAC;
+	SELECT * FROM #EDO_FAC;
 
 	--[42] Estado: Efectos Pendientes
-	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion
+	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion, EF.facNumeroAqua
 	, F.ctrTitDocIden
 	, F.efePdteImporte
 	, F.efePdteCod
@@ -430,10 +438,13 @@ AS
 	AND F.efePdteCod = C.clefePdteCod;
 	
 	--*** DEBUG ****
-	--SELECT * FROM #EDO_EPS;
+	SELECT * FROM #EDO_EPS;
 	
 	--[50]Recibos
-	SELECT EP.facCod, EP.facPerCod, EP.facCtrCod, EP.facVersion, EP.ctrTitDocIden, EP.cobEstado
+	SELECT EP.facCod, EP.facPerCod, EP.facCtrCod, EP.facVersion
+	, EP.facNumeroAqua
+	, EP.ctrTitDocIden
+	, EP.cobEstado
 	, ImporteRecibo= EP.efePdteImporte
 	, Cobrado=ISNULL(EP.TOTAL_EPCOB, 0)
 	, EP.efePdteCod
@@ -445,39 +456,37 @@ AS
 	
 	INSERT INTO #RECIBOS
 	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion
+	, F.facNumeroAqua
 	, F.ctrTitDocIden
 	, F.cobEstado
 	, F.facTotal
 	, ISNULL(F.TOTAL_COB, 0)
 	, 0
-	, deuda=F.facTotal-F.TOTAL_COB
+	, deuda=F.facTotal-ISNULL(F.TOTAL_COB, 0)
 	FROM #EDO_FAC AS F
 	WHERE F.cobEstado NOT IN('CO', 'TR', 'CM', 'FR');
 
 	
+	
 
-	SELECT R.*, F.facNumeroAqua 	
+	SELECT R.*
 	FROM #RECIBOS AS R
-	LEFT JOIN dbo.facturas AS F
-	ON F.facCtrCod = R.facCtrCod
-	AND F.facPerCod = R.facPerCod
-	AND F.facCod = R.facCod
-	AND F.facVersion = R.facVersion
-	WHERE R.ctrTitDocIden='P3803800F'
+	WHERE R.ctrTitDocIden=@NIF
 
 	UNION ALL
 	SELECT facCod=0, facPerCod=0, facCtrCod=0, facVersion=0
+	, ''
 	, E.ctrTitDocIden
 	, cobEstado='PD'
 	, ImporteRecibo=0
 	, Cobrado = EntregasCta
 	, efePdteCod=0
 	, DeudaRecibo = -1*E.EntregasCta
-	, NULL
 	FROM #EC AS E
-	WHERE E.ctrTitDocIden='P3803800F'
-	ORDER BY R.cobEstado;
+	WHERE E.ctrTitDocIden=@NIF
+	ORDER BY R.cobEstado, R.DeudaRecibo;
 	
+	--SELECT * FROM #RECIBOS;
 
 	--END TRY
 	
@@ -497,13 +506,10 @@ AS
 	DROP TABLE IF EXISTS  #RECIBOS;
 
 
-	
-	SELECT * FROM facturas WHERE facNumeroAqua IN('PU1500001420','PU1500002636','PU1900006199','PU1700008152')
-
-	SELECT * FROM contratos WHERE ctrcod=50888
---110428025;110428051;110499893;50888
 --UPDATE U SET usrfpass	= GETDATE(), usrpass1='', usrpass2='', usrpass3=''
 --, usrpass='XNF4R1B11mppeeKkP4VvA9THE+k1oHVHMEjE+6jBLw8MBIZI0+PDgOVw+7at04rtl0jErzjB/xx74lQwagl2CQ==' 
 --FROM Usuarios AS U WHERE usrcod='gmdesousa'
 
 
+--SELECT facNumeroAqua, facFechaVto, facFechaVtoOrig, faccod, facPerCod, facCtrCod, facVersion, facFechaRectif, facNumeroRectif 
+--FROm facturas WHERE facPerCod='000001' AND facCtrCod=110139360 and facCod=1
