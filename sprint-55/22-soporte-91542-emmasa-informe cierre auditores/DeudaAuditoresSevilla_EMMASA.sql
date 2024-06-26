@@ -1,12 +1,12 @@
-/*
+
 DECLARE @p_params NVARCHAR(MAX);
 DECLARE @p_errId_out INT;
 DECLARE @p_errMsg_out NVARCHAR(2048);
 SET @p_params= '<NodoXML><LI><FecDesde>20140601</FecDesde><FecHasta>20240529</FecHasta></LI></NodoXML>';
-
+/*
 EXEC [InformesExcel].[DeudaAuditoresSevilla_EMMASA]  @p_params,  @p_errId_out OUTPUT, @p_errMsg_out OUTPUT;
 SELECT @p_errMsg_out
-*/
+
 
 ALTER PROCEDURE [InformesExcel].[DeudaAuditoresSevilla_EMMASA]
 	@p_params NVARCHAR(MAX),
@@ -14,7 +14,7 @@ ALTER PROCEDURE [InformesExcel].[DeudaAuditoresSevilla_EMMASA]
 	@p_errMsg_out NVARCHAR(2048) OUTPUT
 
 AS
-
+*/
 	--**********
 	--PARAMETROS: 
 	--[1]fecFhacDesde: fecha dede
@@ -75,7 +75,9 @@ AS
 	FROM dbo.medpc AS M WHERE M.mpcdes = 'Domiciliación bancar';
 
 	--[01]Entregas a cuenta: pendientes por cliente
-	SELECT CTR.ctrTitDocIden, CTR.ctrTitCod
+	SELECT CC.clicod
+	, clidociden=UPPER(TRIM(CC.clidociden))
+	, clinom=UPPER(TRIM(CC.clinom))
 	, EntregasCta = SUM(CL.cblImporte)
 	, Fecha = MIN(C.cobFec)
 	INTO #ECTR
@@ -91,25 +93,28 @@ AS
 	INNER JOIN @params AS P 
 	ON (P.fechaD IS NULL OR C.cobFec >= P.fechaD)  AND 
 	(P.fechaH IS NULL OR C.cobFec < P.fechaH)
-	GROUP BY CTR.ctrTitDocIden, CTR.ctrTitCod
+	LEFT JOIN dbo.clientes AS CC
+	ON CC.clicod = CTR.ctrTitCod
+	GROUP BY CC.clicod, UPPER(TRIM(CC.clidociden)), UPPER(TRIM(CC.clinom))
 	HAVING SUM(CL.cblImporte)<>0;
 	
 	--*** DEBUG ****
 	IF(@NIF IS NOT NULL)
-	SELECT [#ECTR] = '#ECTR', * FROM #ECTR WHERE ctrTitDocIden=@NIF;
+	SELECT [#ECTR] = '#ECTR', * FROM #ECTR WHERE clidociden=@NIF;
 	--**************
 	
-	--[02]Entregas a cuenta: pendientes por titular
-	SELECT ctrTitDocIden
-	, EntregasCta = SUM(EntregasCta)
-	, Fecha = MIN(Fecha)
+	--[02]Entregas a cuenta: pendientes por documento identidad y nombre
+	SELECT C.*
+	, Total_EntregasCta = SUM(EntregasCta) OVER(PARTITION BY clidociden, clinom)
+	--RN=1: Linea mas reciente de efecto pendiente con su total
+	, RN = ROW_NUMBER() OVER(PARTITION BY clidociden, clinom ORDER BY Fecha DESC)
+	, CN = COUNT(clidociden) OVER(PARTITION BY clidociden, clinom)
 	INTO #EC
-	FROM #ECTR AS C
-	GROUP BY ctrTitDocIden;
-		
+	FROM #ECTR AS C;
+	
 	--*** DEBUG ****
 	IF(@NIF IS NOT NULL)
-	SELECT [#EC]='#EC', * FROM #EC WHERE ctrTitDocIden=@NIF;
+	SELECT [#EC]='#EC', * FROM #EC WHERE clidociden=@NIF;
 	--**************
 
 	--**************
@@ -119,9 +124,9 @@ AS
 	
 	SELECT T.ftfFacCod, T.ftfFacPerCod, T.ftfFacCtrCod, T.ftfFacVersion, T.ftfImporte
 	INTO #FACTOTALES
-	--FROM _FACTOTALES AS T;
-	FROM dbo.fFacturas_TotalFacturado(NULL, NULL, NULL) AS T;
-
+	FROM _FACTOTALES AS T;
+	--FROM dbo.fFacturas_TotalFacturado(NULL, NULL, NULL) AS T;
+	
 	SET @sql = N'CREATE CLUSTERED INDEX IDX_' + REPLACE(CONVERT(NVARCHAR(50), NEWID()), '-', '') + ' ON #FACTOTALES(ftfFacCod, ftfFacPerCod, ftfFacCtrCod, ftfFacVersion)';
 	EXEC sp_executesql @sql;
 	
@@ -136,7 +141,11 @@ AS
 	, F.facNumero
 	, F.facEstado
 	, F.facNumeroAqua
+	--Hay NIFs que no coinciden con el del titular, nos quedamos con el del cliente titular
+	, CL.clidociden 
 	, C.ctrTitDocIden 
+	, C.ctrTitCod
+	, C.ctrTitNom
 	--**********************
 	, F.facFechaRectif
 	, F.facNumeroRectif
@@ -168,16 +177,23 @@ AS
 	INNER JOIN @params AS P
 	ON  (P.fechaD IS NULL OR F.facFecha >= P.fechaD) 
 	AND (P.fechaH IS NULL OR F.facFecha < P.fechaH)
-
+	LEFT JOIN dbo.clientes AS CL
+	ON CL.clicod = C.ctrTitCod
 	WHERE F.facNumero IS NOT NULL	--Se excluyen las prefacturas
 	AND F.facEstado NOT IN (4,5)	--Se excluyen las (4) AGRUPADAS NI (5) TRASPASADAS-TR-. No es deuda 	
-	AND ctrTitDocIden=@NIF;
+	AND (@NIF IS NULL OR CL.clidociden=@NIF);
 
 	SET @sql = N'CREATE CLUSTERED INDEX IDX_' + REPLACE(CONVERT(NVARCHAR(50), NEWID()), '-', '') + ' ON #FACS(facCod, facPerCod, facCtrCod, facVersion)';
 	EXEC sp_executesql @sql;	
-	
+
+
+		
 	--*** DEBUG ***
-	--SELECT * FROM #FACS WHERE ctrTitDocIden=@NIF;
+	--SELECT * FROM #FACS;
+	--Hay NIFs que no coinciden con el del titular, nos quedamos con el del cliente titular
+	--SELECT * FROM #FACS WHERE clidociden <> ctrTitDocIden;
+	--SELECT * FROM #FACS WHERE clidociden <> ctrTitDocIden AND SUBSTRING(clidociden, 1, 8)=SUBSTRING(ctrTitDocIden,1, 8);
+	--************
 		
 	--**********************
 	--[12]RECTIFICATIVAS: Para saber las "Anuladas", tenemos que calcular el importe de las facturas rectificativas
@@ -263,7 +279,7 @@ AS
 
 	--*** DEBUG ****
 	IF(@NIF IS NOT NULL)
-	SELECT [#FACS] = '#FACS', * FROM #FACS WHERE ctrTitDocIden=@NIF ORDER BY facPerCod;
+	SELECT [#FACS] = '#FACS', * FROM #FACS WHERE clidociden=@NIF ORDER BY facPerCod;
 	--**************
 	
 	--**************
@@ -273,7 +289,10 @@ AS
 	, F.facCtrCod
 	, F.facPerCod
 	, F.facVersion
+	, F.clidociden
 	, F.ctrTitDocIden
+	, F.ctrTitNom
+	, F.ctrTitCod
 	, EP.efePdteCod
 	, EP.efePdteScd
 	, EP.efePdteImporte
@@ -360,7 +379,10 @@ AS
 	--#EDO_FAC
 	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion, F.facNumeroAqua
 	, F.facTotal
+	, F.clidociden
 	, F.ctrTitDocIden
+	, F.ctrTitNom
+	, F.ctrTitCod
 	, F.facFecha
 	, EPS.TOTAL_EPS --Totalizacion de los efectos pendientes
 	, C.TOTAL_COB	--Total cobrado por factura
@@ -413,7 +435,10 @@ AS
 	--[42] Estado: Efectos Pendientes
 	--#EDO_EPS
 	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion, EF.facNumeroAqua
+	, F.clidociden
 	, F.ctrTitDocIden
+	, F.ctrTitNom
+	, F.ctrTitCod
 	, F.efePdteImporte
 	, F.efePdteCod
 	, F.efePdteFecVencimiento
@@ -454,6 +479,7 @@ AS
 	AND F.efePdteCod = C.clefePdteCod;
 	
 	--*** DEBUG ****
+	IF(@NIF IS NOT NULL)
 	SELECT [#EDO_EPS]='#EDO_EPS', * FROM #EDO_EPS;
 	--**************
 	
@@ -461,7 +487,10 @@ AS
 	--Efectos Pendientes
 	SELECT EP.facCod, EP.facPerCod, EP.facCtrCod, EP.facVersion
 	, EP.facNumeroAqua
+	, EP.clidociden
 	, EP.ctrTitDocIden
+	, EP.ctrTitNom
+	, EP.ctrTitCod
 	, EP.cobEstado
 	, ImporteRecibo= EP.efePdteImporte
 	, Cobrado=ISNULL(EP.TOTAL_EPCOB, 0)
@@ -472,12 +501,15 @@ AS
 	FROM #EDO_EPS AS EP
 	WHERE EP.cobEstado NOT IN('CO', 'TR', 'CM', 'FR');
 	
-	
+
 	--Facturas
 	INSERT INTO #RECIBOS
 	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion
 	, F.facNumeroAqua
+	, F.clidociden
 	, F.ctrTitDocIden
+	, F.ctrTitNom
+	, F.ctrTitCod
 	, F.cobEstado
 	, ImporteRecibo = F.facTotal
 	, Cobrado = ISNULL(F.TOTAL_COB, 0)
@@ -490,41 +522,42 @@ AS
 	/*
 	SELECT R.facCod, R.facPerCod, R.facCtrCod, R.facVersion
 	, R.facNumeroAqua
-	, R.ctrTitDocIden
+	, R.clidociden
 	, R.cobEstado
 	, R.ImporteRecibo
 	, R.Cobrado
 	, R.efePdteCod
 	, R.DeudaRecibo
 	FROM #RECIBOS AS R
-	WHERE (@NIF IS NULL OR  R.ctrTitDocIden=@NIF)
-
+	WHERE (@NIF IS NULL OR  R.clidociden=@NIF)
+	
 	UNION ALL
 	SELECT facCod=0, facPerCod=0, facCtrCod=0, facVersion=0
 	, facNumeroAqua = ''
-	, E.ctrTitDocIden
+	, E.clidociden
 	, cobEstado='PD'
 	, ImporteRecibo=0
 	, Cobrado = EntregasCta
 	, efePdteCod=0
-	, DeudaRecibo = -1*E.EntregasCta
+	, DeudaRecibo = -1*E.Total_EntregasCta
 	FROM #EC AS E
-	WHERE (@NIF IS NULL OR E.ctrTitDocIden=@NIF)
+	WHERE RN=1 AND (@NIF IS NULL OR E.clidociden=@NIF)
 	ORDER BY R.cobEstado, R.DeudaRecibo;
-	*/
 	
+
 	WITH CLI AS(
 	--Para quedarnos con la ultima instancia del mismo cliente por DNI
 	SELECT  clidociden = UPPER(LTRIM(LTRIM(C.clidociden)))
 	, clinom = UPPER(LTRIM(LTRIM(C.clinom)))
 	, fecha = ISNULL(C.cliFecUltMod, C.cliFecReg)
-	--RN=1: Para quedarnos con el ultimo cliente
+	--RN=1: Para quedarnos con el ultimo cliente del mismo DNI
 	, RN = ROW_NUMBER() OVER (PARTITION BY  UPPER(LTRIM(LTRIM(C.clidociden))) ORDER BY ISNULL(C.cliFecUltMod, C.cliFecReg) DESC)
 	FROM dbo.clientes AS C)
-
+	*/
 	--Facturas y Efectos Pendientes
-	SELECT [NIF] = R.ctrTitDocIden
-	, [Nombre] = C.clinom
+	WITH T AS(
+	SELECT [NIF] = R.clidociden
+	, [Nombre] = R.ctrTitNom
 	, [Factura] = R.facNumeroAqua
 	, [Fecha Factura] = CAST(R.Fecha AS DATE)
 	, [Estado] = R.cobEstado
@@ -532,25 +565,30 @@ AS
 	, [Importe PAGO] = IIF(cobEstado IS NOT NULL AND cobEstado='PD', 0, R.DeudaRecibo)
 	, [Importe DEVOLUCION] = IIF(cobEstado IS NOT NULL AND cobEstado='PD', R.DeudaRecibo*-1, 0)
 	FROM #RECIBOS AS R
-	LEFT JOIN CLI AS C
-	ON R.ctrTitDocIden = C.clidociden AND C.RN=1
-	WHERE (@NIF IS NULL OR  R.ctrTitDocIden=@NIF)
+	WHERE (@NIF IS NULL OR  R.clidociden=@NIF)
 
 
 	UNION ALL
-	SELECT [NIF] = E.ctrTitDocIden
-	, [Nombre] = C.clinom
+	SELECT [NIF] = E.clidociden
+	, [Nombre] = E.clinom
 	, [Factura] = NULL
 	, [Fecha Factura] = CAST(E.Fecha AS DATE)
 	, [Estado] = 'PD'
 	, [Importe RECIBO] = NULL
 	, [Importe PAGO] = 0
-	, [Importe DEVOLUCION] = E.EntregasCta
+	, [Importe DEVOLUCION] = E.Total_EntregasCta
+
 	FROM #EC AS E
-	LEFT JOIN CLI AS C
-	ON E.ctrTitDocIden = C.clidociden AND C.RN=1
-	WHERE (@NIF IS NULL OR E.ctrTitDocIden=@NIF)
-	ORDER BY [NIF], [Factura];	
+	--RN=1: Para quedarnos solo con el efecto pendiente mas reciente por NIF y Nombre
+	WHERE RN=1 AND (@NIF IS NULL OR E.clidociden=@NIF)
+	--ORDER BY [NIF], [Nombre], [Factura]
+	)
+
+	SELECT * 
+	--, RN = ROW_NUMBER() OVER (PARTITION BY NIF, Nombre ORDER BY [Factura] DESC)
+	--, DEUDA = SUM([Importe PAGO] ) OVER (PARTITION BY NIF, Nombre)
+	--, DEVOLUCION= SUM([Importe DEVOLUCION]) OVER (PARTITION BY NIF, Nombre)
+	FROM T;
 
 	END TRY
 	
