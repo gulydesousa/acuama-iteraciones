@@ -21,7 +21,7 @@ AS
 	--[2]fechFacHasta: fecha hasta
 	--**********
 	--*** DEBUG ****
-	DECLARE @NIF VARCHAR(25);-- = '42086521V';
+	DECLARE @NIF VARCHAR(25) = 'B76643865';
 	--**************
 
 	SET NOCOUNT ON;   
@@ -353,6 +353,12 @@ AS
 	, RN_EPCOB = ROW_NUMBER() OVER (PARTITION BY F.facCod , F.facPerCod, F.facCtrCod, CLEP.clefePdteCod ORDER BY CB.cobFec DESC, CB.cobfecReg DESC)
 	--CN_EPCOB: Número de cobros por efectos pendientes
 	, CN_EPCOB = COUNT(CB.cobNum) OVER (PARTITION BY F.facCod , F.facPerCod, F.facCtrCod, CLEP.clefePdteCod)
+	--¿Cuantos EP se cobran con esta linea de cobro?
+	, CN_EPCOBL = COUNT(CLEP.clefePdteCod) OVER (PARTITION BY CLEP.cleCblScd, CLEP.cleCblPpag, CLEP.cleCblNum, cleCblLin, CLEP.clefePdteCtrCod, CLEP.clefePdtePerCod)
+	, RN_EPCOBL = ROW_NUMBER() OVER (PARTITION BY CLEP.cleCblScd, CLEP.cleCblPpag, CLEP.cleCblNum, cleCblLin, CLEP.clefePdteCtrCod, CLEP.clefePdtePerCod ORDER BY CLEP.clefePdteCod)
+	, SUM_EPLCOBL = SUM(EP.efePdteImporte) OVER (PARTITION BY CLEP.cleCblScd, CLEP.cleCblPpag, CLEP.cleCblNum, cleCblLin, CLEP.clefePdteCtrCod, CLEP.clefePdtePerCod)
+	--Si se cobra mas de un efecto pendiente con esta linea de cobro, tenemos que saldar cada efecto pendiente
+	, EP.efePdteImporte	
 	INTO #COBS
 	FROM  #FACS AS F	
 	INNER JOIN dbo.cobros AS CB
@@ -368,13 +374,25 @@ AS
 	ON  CLEP.cleCblScd = CBL.cblScd
 	AND CLEP.cleCblPpag = CBL.cblPpag
 	AND CLEP.cleCblNum = CBL.cblNum
-	AND CLEP.cleCblLin = CBL.cblLin;
+	AND CLEP.cleCblLin = CBL.cblLin
+	LEFT JOIN #EPS AS EP
+	ON CLEP.clefePdteFacCod = EP.facCod
+	AND CLEP.clefePdtePerCod = EP.facPerCod
+	AND CLEP.clefePdteCtrCod = EP.facCtrCod
+	AND CLEP.clefePdteCod = EP.efePdteCod;
 	
+
 	--*** DEBUG ****
 	IF(@NIF IS NOT NULL)
 	SELECT [#COBS]='#COBS', * FROM #COBS ORDER BY facCtrCod, facPerCod, RN_COB;
+	--Junio-2024: El total cobrado es exactamente igual a la suma de los efectos pendientes => Marcamos las facturas como cobradas
+	--Si no llega a cumplirse esta condicion van a salir descuadres, ya veremos!
+	SELECT * FROM #COBS WHERE CN_EPCOBL>1 AND cblImporte<> SUM_EPLCOBL;
 	--**************
 	
+	
+
+
 	--[41] Estado: Facturas
 	--#EDO_FAC
 	SELECT F.facCod, F.facPerCod, F.facCtrCod, F.facVersion, F.facNumeroAqua
