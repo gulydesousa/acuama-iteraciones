@@ -293,6 +293,7 @@ AS
 	, F.ctrTitDocIden
 	, F.ctrTitNom
 	, F.ctrTitCod
+	, F.facNumeroAqua
 	, EP.efePdteCod
 	, EP.efePdteScd
 	, EP.efePdteImporte
@@ -325,6 +326,7 @@ AS
 	, F.facPerCod
 	, F.facCtrCod
 	, F.facVersion
+	, F.facNumeroAqua
 	, [efePdteCod] = CAST(NULL AS INT)
 	, [efePdteScd] = CAST(NULL AS INT)
 	, CB.cobScd
@@ -359,7 +361,7 @@ AS
 	--****************************************
 	--[40]Cobros por efecto pendiente
 	--#CLEP: Extraemos las lineas de cobros con sus efectos pendientes
-	SELECT EP.facCod, EP.facPerCod, EP.facCtrCod, EP.facVersion, EP.efePdteCod, EP.efePdteScd
+	SELECT EP.facCod, EP.facPerCod, EP.facCtrCod, EP.facVersion, EP.efePdteCod, EP.efePdteScd, EP.facNumeroAqua
 	, CLEP.*, EP.efePdteImporte, CL.cblImporte 
 	--CN: ¿Cuantos efectos pendientes hay asociados a una misma linea de cobro?
 	, CN = COUNT(clefePdteCod) OVER (PARTITION BY CLEP.cleCblScd, CLEP.cleCblScd,  CLEP.cleCblNum,  CLEP.cleCblLin)
@@ -425,6 +427,7 @@ AS
 	, CL.facPerCod
 	, CL.facCtrCod
 	, CL.facVersion
+	, CL.facNumeroAqua
 	, CL.efePdteCod
 	, CL.efePdteScd
 	, C.cobScd
@@ -452,6 +455,7 @@ AS
 	
 	
 	-- #COBS
+	/*
 	SELECT F.facCod 
 	, F.facPerCod
 	, F.facCtrCod
@@ -520,7 +524,7 @@ AS
 	--Si no llega a cumplirse esta condicion van a salir descuadres, ya veremos!
 	--SELECT * FROM #COBS WHERE CN_EPCOBL>1 AND cblImporte<> SUM_EPLCOBL;
 	--**************
-	
+	*/
 	
 	--[41] Estado: Facturas
 	--#EDO_FAC
@@ -562,9 +566,10 @@ AS
 	ELSE '' END
 	INTO #EDO_FAC
 	FROM #FACS AS F
-	LEFT JOIN #COBS AS C
+	LEFT JOIN #COBROS AS C
 	ON F.RN_FAC=1  --Ultima version de la factura
 	AND C.RN_COB=1 --Ultimo cobro de esta factura
+	AND C.efePdteCod IS NULL
 	AND F.facCod = C.facCod
 	AND F.facPerCod = C.facPerCod
 	AND F.facCtrCod = C.facCtrCod
@@ -589,18 +594,18 @@ AS
 	, F.efePdteImporte
 	, F.efePdteCod
 	, F.efePdteFecVencimiento
-	, C.TOTAL_EPCOB		--Total cobrado por efecto pendiente
-	, C.CN_EPCOB		--Numero de cobros por efecto pendiente
+	, C.TOTAL_COB	--Total cobrado por efecto pendiente
+	, C.CN_COB		--Numero de cobros por efecto pendiente
 	--********************
 	--FACTURA ESTADO PAGO
 	--********************
 	, [cobEstado] = CASE 
 	--PD: Si el importe cobrado supera el importe total del efecto pendiente (Pendiente devolución)
-	WHEN ROUND(ISNULL(C.TOTAL_EPCOB, 0), 2) > F.efePdteImporte  THEN 'PD' 
+	WHEN ROUND(ISNULL(C.TOTAL_COB, 0), 2) > F.efePdteImporte  THEN 'PD' 
 	--CD: Cobro detenido/Facturas
 	WHEN EF.cobEstado IN ('CD') THEN EF.cobEstado
 	--CO: Cobrado/ factura cobrada
-	WHEN ROUND(ISNULL(C.TOTAL_EPCOB, 0), 2) = F.efePdteImporte THEN 'CO'
+	WHEN ROUND(ISNULL(C.TOTAL_COB, 0), 2) = F.efePdteImporte THEN 'CO'
 	--VE: Vencido/ Facturas no cobradas y la fecha de vencimiento se ha cumplido. Prevalece sobre el aplazado
 	WHEN F.efePdteFecVencimiento <  @ahora THEN 'VE'	
 	--DE: Devuelto/ Solo cuando la devolución es de banco
@@ -618,12 +623,13 @@ AS
 	AND EF.facCtrCod = F.facCtrCod
 	AND EF.facPerCod = F.facPerCod
 	AND EF.facVersion = F.facVersion
-	LEFT JOIN #COBS AS C
-	ON  C.RN_EPCOB=1 --Ultimo cobro por efecto pendiente
+	LEFT JOIN #COBROS AS C
+	ON  C.RN_COB=1 --Ultimo cobro por efecto pendiente
+	AND F.efePdteCod = C.efePdteCod
 	AND F.facCod = C.facCod
 	AND F.facPerCod = C.facPerCod
 	AND F.facCtrCod = C.facCtrCod
-	AND F.efePdteCod = C.clefePdteCod;
+	AND F.efePdteCod = C.efePdteCod;
 	
 	--*** DEBUG ****
 	IF(@NIF IS NOT NULL)
@@ -640,9 +646,9 @@ AS
 	, EP.ctrTitCod
 	, EP.cobEstado
 	, ImporteRecibo= EP.efePdteImporte
-	, Cobrado=ISNULL(EP.TOTAL_EPCOB, 0)
+	, Cobrado=ISNULL(EP.TOTAL_COB, 0)
 	, EP.efePdteCod
-	, DeudaRecibo=EP.efePdteImporte-ISNULL(EP.TOTAL_EPCOB, 0)
+	, DeudaRecibo=EP.efePdteImporte-ISNULL(EP.TOTAL_COB, 0)
 	, Fecha = CAST(EP.efePdteFecVencimiento AS DATE)
 	INTO #RECIBOS
 	FROM #EDO_EPS AS EP
@@ -736,6 +742,9 @@ AS
 	--, DEUDA = SUM([Importe PAGO] ) OVER (PARTITION BY NIF, Nombre)
 	--, DEVOLUCION= SUM([Importe DEVOLUCION]) OVER (PARTITION BY NIF, Nombre)
 	FROM T;
+
+	SELECT * FROM #COBROS WHERE facNumeroAqua='1200-2-24120086';
+
 
 	END TRY
 	
