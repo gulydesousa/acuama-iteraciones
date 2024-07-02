@@ -18,7 +18,7 @@ CREATE PROCEDURE [dbo].[Excel_ExcelConsultas.DeudaTipoFactura_EMMASA]
 	@p_errMsg_out NVARCHAR(2048) OUTPUT
 
 AS
-*/
+
 	--**********
 	--PARAMETROS: 
 	--[1]fecFhacDesde: fecha dede
@@ -834,6 +834,27 @@ AS
 	[Fecha Nuevo VTO]
 	FROM #ENTREGASCUENTA
 
+	SELECT 
+	YEAR([Fecha Factura]),
+	[Tipo Factura],
+	Factura,
+	 CASE WHEN Uso is null THEN '*************' ELSE Uso END AS Uso,
+	facEstadoEmmasa,
+	contrato,
+	exentoCorte,
+	estadoContrato,
+	NIF,
+	Nombre,
+	tipo,
+	efePdteCod,
+	estado,
+	[Importe DEUDA],
+	NULL, 
+	[Fecha VTO. Origen], 
+	[Fecha Nuevo VTO]
+	FROM #ENTREGASCUENTA
+
+
 	
 	/*--MUY IMPORTANTE garantizar el orden deterministico en ambas tablas
 	ORDER BY Año, facNumeroAqua, ID;
@@ -895,3 +916,4 @@ AS
 GO
 
 
+*/
