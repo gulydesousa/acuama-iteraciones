@@ -1,5 +1,4 @@
 /*
-SELECT * FROM dbo.ExcelConsultas
 INSERT INTO dbo.ExcelConsultas
 VALUES ('321_2024',	'Deuda auditores sevilla', 'Deuda Auditores Sevilla', 1, '[InformesExcel].[DeudaAuditoresSevilla_EMMASA]', '001', 'Totaliza la deuda por NIF del Titular del contrato.<br> Se espera que los totales coincidan con los del informe <b>"Deuda Tipo Factura"</b>-Excel_ExcelConsultas.DeudaTipoFactura_EMMASA-');
 
@@ -10,20 +9,18 @@ SELECT *
 --DELETE
 FROM excelPerfil WHERE ExPCod='321_2024'
 */
-
-
 /*
 --DROP PROCEDURE  [InformesExcel].[DeudaAuditoresSevilla_EMMASA]
 DECLARE @p_params NVARCHAR(MAX);
 DECLARE @p_errId_out INT;
 DECLARE @p_errMsg_out NVARCHAR(2048);
-SET @p_params= '<NodoXML><LI><FecDesde>20140601</FecDesde><FecHasta>20240529</FecHasta></LI></NodoXML>';
+SET @p_params= '<NodoXML><LI><FecDesde>20140601</FecDesde><FecHasta>20240702</FecHasta></LI></NodoXML>';
 
 EXEC [InformesExcel].[DeudaAuditoresSevilla_EMMASA]  @p_params,  @p_errId_out OUTPUT, @p_errMsg_out OUTPUT;
 SELECT @p_errMsg_out
 */
 
-CREATE PROCEDURE [InformesExcel].[DeudaAuditoresSevilla_EMMASA]
+ALTER PROCEDURE [InformesExcel].[DeudaAuditoresSevilla_EMMASA]
 	@p_params NVARCHAR(MAX),
 	@p_errId_out INT OUTPUT, 
 	@p_errMsg_out NVARCHAR(2048) OUTPUT
@@ -39,7 +36,7 @@ AS
 	--*** DEBUG ****
 	--Cambiando esta variable podemos probar para un solo NIF
 	--Nos retorna las  temporales en el camino
-	DECLARE @NIF VARCHAR(25)--= 'Y3908314F';
+	DECLARE @NIF VARCHAR(25)= '41877791N';
 	--**************
 
 	SET NOCOUNT ON;   
@@ -648,7 +645,8 @@ AS
 	WHERE  (@NIF IS NULL OR E.NIF=@NIF))
 
 	--****  RESULTADO ****
-	SELECT [NIF], [Nombre], [Factura], [Fecha Factura], [Estado], [Importe PAGO], [Importe DEVOLUCION] 
+	SELECT [NIF], [Nombre], [Factura], [Fecha Factura], [Estado], [Importe PAGO], [Importe DEVOLUCION]
+		 , [Importe Deuda] , [Cod_EfectoPdte] 
 	FROM T
 	ORDER BY [NIF], [Nombre], [Factura], [Cod_EfectoPdte];
 	
@@ -659,6 +657,7 @@ AS
 			 ,  @p_errMsg_out= ERROR_MESSAGE();
 	END CATCH
 
+	--********************************
 	DROP TABLE IF EXISTS  #FACTOTALES;
 	DROP TABLE IF EXISTS  #FACS;
 	DROP TABLE IF EXISTS  #EDO_FAC;
