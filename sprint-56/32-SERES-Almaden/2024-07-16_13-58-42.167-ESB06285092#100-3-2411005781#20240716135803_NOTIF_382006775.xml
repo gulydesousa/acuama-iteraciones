@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DeliveryFeedback><StatusFeedback><InvoiceFeedback><InvoiceId>100-3-2411005781</InvoiceId>
+      <Supplier><Cif>ESB06285092</Cif>
+      </Supplier>
+      <Buyer><Cif>ESA12006961</Cif>
+      </Buyer>
+      <InvoiceDate>2024-06-26</InvoiceDate>
+      <Feedback><Status>NACEP</Status>
+        <StatusDate>2024-07-16T13:57:33</StatusDate>
+        <Reasons><Reason><Code>00101</Code>
+            <Description>Factura duplicada</Description>
+          </Reason>
+        </Reasons>
+      </Feedback>
+    </InvoiceFeedback>
+  </StatusFeedback>
+</DeliveryFeedback>

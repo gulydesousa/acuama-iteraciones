@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DeliveryFeedback><StatusFeedback><InvoiceFeedback><InvoiceId>100-2-241003948</InvoiceId>
+      <Supplier><Cif>ESB06285092</Cif>
+        <Dept>CB550211</Dept>
+      </Supplier>
+      <Buyer><Cif>ESP1300035A</Cif>
+      </Buyer>
+      <InvoiceDate>2024-03-26</InvoiceDate>
+      <InvoiceLink>https://miacceso.e-factura.net/BackOffice?cif=ESB06285092&amp;document=100-2-241003948&amp;date=20240722085235&amp;code=RkPraYZN7MiYliZ1sWLSS%2FRTW8fvhi%2F1OJP7h%2FPN5%2FHwL1IoDUw5uyThu%2BKOoK9gIGmu%2BXEETjfLM6jbJRJEBxgivOiI8miluYigNtB6%2FiTfeaeF%2BVeyNAxESZ2dJFBFEb1IZnbkljE%3D&amp;action=01</InvoiceLink>
+      <TargetService>FACE</TargetService>
+      <Feedback><Status>RGTDA</Status>
+        <StatusDate>2024-07-22T08:53:43</StatusDate>
+        <Reasons><Reason><Code>00000</Code>
+            <Description>Factura registrada en FACE [REGAGE24e00055023006]</Description>
+          </Reason>
+        </Reasons>
+        <InvoiceRegister><Register><RegisterSender>FACE</RegisterSender>
+            <RegisterType>IN</RegisterType>
+            <RegisterId>REGAGE24e00055023006</RegisterId>
+            <RegisterDate>2024-07-22T08:53:42</RegisterDate>
+          </Register>
+        </InvoiceRegister>
+      </Feedback>
+    </InvoiceFeedback>
+  </StatusFeedback>
+</DeliveryFeedback>

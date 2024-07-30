@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DeliveryFeedback><StatusFeedback><InvoiceFeedback><InvoiceId>100-3-2411002831</InvoiceId>
+      <Supplier><Cif>ESB06285092</Cif>
+      </Supplier>
+      <Buyer><Cif>ESA12006961</Cif>
+      </Buyer>
+      <InvoiceDate>2024-03-25</InvoiceDate>
+      <InvoiceLink>https://miacceso.e-factura.net/BackOffice?cif=ESB06285092&amp;document=100-3-2411002831&amp;date=20240410144647&amp;code=jObnykAlZc2BiUJJC6JRhPLZh14lxGJaiyUM2QHHJ7P0pSdYLiUhFgQbGJUPEKsqGYYFEfWKwsbMWbhalX4ltd9qygSiVzigtrNYTsJRUt6OzKK8PWKYCVMszbnW274BZJtUlNNiXrU%3D&amp;action=01</InvoiceLink>
+      <Feedback><Status>CONTA</Status>
+        <StatusDate>2024-04-15T15:30:18</StatusDate>
+        <Reasons><Reason><Code>00001</Code>
+            <Description>Contabilizada: pendiente de pago. Se realizan pagos de forma periodica todas las semanas</Description>
+          </Reason>
+        </Reasons>
+      </Feedback>
+    </InvoiceFeedback>
+  </StatusFeedback>
+</DeliveryFeedback>

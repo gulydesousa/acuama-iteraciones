@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DeliveryFeedback><StatusFeedback><InvoiceFeedback><InvoiceId>100-3-2311009239</InvoiceId>
+      <Supplier><Cif>ESB06285092</Cif>
+      </Supplier>
+      <Buyer><Cif>ESA12006961</Cif>
+      </Buyer>
+      <InvoiceDate>2023-12-26</InvoiceDate>
+      <InvoiceLink>https://miacceso.e-factura.net/BackOffice?cif=ESB06285092&amp;document=100-3-2311009239&amp;date=20240110143734&amp;code=IQfCIIlfKvsRhc93UT89dJEalR%2B9Yqc0Yv2r75V%2Bh0OcJ3yOcA1%2Bo3pQN3OxyNaOtIhpgR224SMyzsT%2FA6cjL7OMxQuFNxw27rZmTrx3Z%2BTHJXdJTJEi5Hx2LBDeGngMo20bP6ccFLk%3D&amp;action=01</InvoiceLink>
+      <Feedback><Status>TRAM</Status>
+        <StatusDate>2024-01-10T19:46:36</StatusDate>
+        <Reasons><Reason><Code>00001</Code>
+            <Description>Tratando administracion. Dirija su consulta al email facturasproveedores@grupogimeno.com</Description>
+          </Reason>
+        </Reasons>
+      </Feedback>
+    </InvoiceFeedback>
+  </StatusFeedback>
+</DeliveryFeedback>
