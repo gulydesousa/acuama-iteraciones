@@ -1,0 +1,809 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:cl="http://schemas.microsoft.com/sqlserver/reporting/2010/01/componentdefinition" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/reportdefinition">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource1">
+      <DataSourceReference>ConexionBD</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>b37da672-4d60-4455-9a83-773adcb6e3bd</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+    <DataSet Name="OrdenesTrabajo">
+      <Query>
+        <DataSourceName>DataSource1</DataSourceName>
+        <QueryParameters>
+          <QueryParameter Name="@sociedad">
+            <Value>=Parameters!sociedad.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@zonaContrato">
+            <Value>=Parameters!zonaContrato.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@serie">
+            <Value>=Parameters!serie.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@numeroD">
+            <Value>=Parameters!numeroD.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@numeroH">
+            <Value>=Parameters!numeroH.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@fechaSolicitudD">
+            <Value>=Parameters!fechaSolicitudD.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@fechaSolicitudH">
+            <Value>=Parameters!fechaSolicitudH.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@fechaRealizacionD">
+            <Value>=Parameters!fechaRealizacionD.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@fechaRealizacionH">
+            <Value>=Parameters!fechaRealizacionH.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@fechaCierreD">
+            <Value>=Parameters!fechaCierreD.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@fechaCierreH">
+            <Value>=Parameters!fechaCierreH.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@tipo">
+            <Value>=Parameters!tipo.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@tieneFCierre">
+            <Value>=Parameters!zonaContrato.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@tieneFrealizacion">
+            <Value>=Parameters!zonaContrato.Value</Value>
+          </QueryParameter>
+        </QueryParameters>
+        <CommandType>StoredProcedure</CommandType>
+        <CommandText>ReportingServices.OrdenesTrabajo_EMMASA</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="otserscd">
+          <DataField>otserscd</DataField>
+          <rd:TypeName>System.Int16</rd:TypeName>
+        </Field>
+        <Field Name="otsercod">
+          <DataField>otsercod</DataField>
+          <rd:TypeName>System.Int16</rd:TypeName>
+        </Field>
+        <Field Name="otnum">
+          <DataField>otnum</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="otottcod">
+          <DataField>otottcod</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="otobs">
+          <DataField>otobs</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="otObsRealizacion">
+          <DataField>otObsRealizacion</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="otObs_SplitPosition">
+          <DataField>otObs_SplitPosition</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="otAcoNumero">
+          <DataField>otAcoNumero</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="otAcometida">
+          <DataField>otAcometida</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="otAcoLinea">
+          <DataField>otAcoLinea</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="rptotLeyendaFirma">
+          <DataField>rptotLeyendaFirma</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="rptotInfoContadores">
+          <DataField>rptotInfoContadores</DataField>
+          <rd:TypeName>System.Byte</rd:TypeName>
+        </Field>
+        <Field Name="otObs_">
+          <DataField>otObs_</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="iCopia">
+          <DataField>iCopia</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="RN_ACL">
+          <DataField>RN_ACL</DataField>
+          <rd:TypeName>System.Int64</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <ReportItems>
+          <Tablix Name="Tablix1">
+            <TablixBody>
+              <TablixColumns>
+                <TablixColumn>
+                  <Width>20.3536cm</Width>
+                </TablixColumn>
+              </TablixColumns>
+              <TablixRows>
+                <TablixRow>
+                  <Height>0.44191in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Subreport Name="Subreport2">
+                          <ReportName>TO013_OrdenTrabajo_Encabezado_EMMASA</ReportName>
+                          <Parameters>
+                            <Parameter Name="otserscd">
+                              <Value>=Fields!otserscd.Value</Value>
+                            </Parameter>
+                            <Parameter Name="otsercod">
+                              <Value>=Fields!otsercod.Value</Value>
+                            </Parameter>
+                            <Parameter Name="otnum">
+                              <Value>=Fields!otnum.Value</Value>
+                            </Parameter>
+                          </Parameters>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Subreport>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.26517in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="otnum1">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=First(Fields!otnum.Value)</Value>
+                                  <Style>
+                                    <FontSize>9pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>otnum1</rd:DefaultName>
+                          <Visibility>
+                            <Hidden>true</Hidden>
+                          </Visibility>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>Khaki</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.27084in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Subreport Name="Subreport8">
+                          <ReportName>TO013_OrdenTrabajo_EMMASA</ReportName>
+                          <Parameters>
+                            <Parameter Name="otserscd">
+                              <Value>=Fields!otserscd.Value</Value>
+                            </Parameter>
+                            <Parameter Name="otsercod">
+                              <Value>=Fields!otsercod.Value</Value>
+                            </Parameter>
+                            <Parameter Name="otnum">
+                              <Value>=Fields!otnum.Value</Value>
+                            </Parameter>
+                          </Parameters>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Subreport>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.27084in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Rectangle Name="Rectangle2">
+                          <ReportItems>
+                            <Subreport Name="Subreport5">
+                              <ReportName>TO013_OrdenTrabajo_AcometidaMultiple_EMMASA</ReportName>
+                              <Parameters>
+                                <Parameter Name="otserscd">
+                                  <Value>=Fields!otserscd.Value</Value>
+                                </Parameter>
+                                <Parameter Name="otsercod">
+                                  <Value>=Fields!otsercod.Value</Value>
+                                </Parameter>
+                                <Parameter Name="otnum">
+                                  <Value>=Fields!otnum.Value</Value>
+                                </Parameter>
+                              </Parameters>
+                              <Top>0.14584in</Top>
+                              <Height>0.125in</Height>
+                              <Width>8.01323in</Width>
+                              <Visibility>
+                                <Hidden>=Fields!otAcometida.Value&lt;&gt;2</Hidden>
+                              </Visibility>
+                              <Style>
+                                <Border>
+                                  <Style>None</Style>
+                                </Border>
+                              </Style>
+                            </Subreport>
+                            <Subreport Name="Subreport4">
+                              <ReportName>TO013_OrdenTrabajo_AcometidaUnica_EMMASA</ReportName>
+                              <Parameters>
+                                <Parameter Name="otserscd">
+                                  <Value>=Fields!otserscd.Value</Value>
+                                </Parameter>
+                                <Parameter Name="otsercod">
+                                  <Value>=Fields!otsercod.Value</Value>
+                                </Parameter>
+                                <Parameter Name="otnum">
+                                  <Value>=Fields!otnum.Value</Value>
+                                </Parameter>
+                              </Parameters>
+                              <Height>0.14584in</Height>
+                              <Width>8.01323in</Width>
+                              <ZIndex>1</ZIndex>
+                              <Visibility>
+                                <Hidden>= Fields!otAcometida.Value&lt;&gt;1</Hidden>
+                              </Visibility>
+                              <Style>
+                                <Border>
+                                  <Style>None</Style>
+                                </Border>
+                              </Style>
+                            </Subreport>
+                          </ReportItems>
+                          <KeepTogether>true</KeepTogether>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Width>1pt</Width>
+                            </BottomBorder>
+                            <LeftBorder>
+                              <Color>Black</Color>
+                              <Width>1pt</Width>
+                            </LeftBorder>
+                            <RightBorder>
+                              <Color>Black</Color>
+                              <Width>1pt</Width>
+                            </RightBorder>
+                          </Style>
+                        </Rectangle>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.16667in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Subreport Name="Subreport1">
+                          <ReportName>TO013_OrdenTrabajo_ContadorInstalar_EMMASA</ReportName>
+                          <Parameters>
+                            <Parameter Name="otnum">
+                              <Value>=Fields!otnum.Value</Value>
+                            </Parameter>
+                            <Parameter Name="otsercod">
+                              <Value>=Fields!otsercod.Value</Value>
+                            </Parameter>
+                            <Parameter Name="otserscd">
+                              <Value>=Fields!otserscd.Value</Value>
+                            </Parameter>
+                          </Parameters>
+                          <Visibility>
+                            <Hidden>=IsNothing(Fields!rptotInfoContadores.Value) OR Fields!rptotInfoContadores.Value&lt;&gt;1</Hidden>
+                          </Visibility>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Subreport>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.25in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Subreport Name="Subreport7">
+                          <ReportName>TO013_OrdenTrabajo_ContadorCambio_EMMASA</ReportName>
+                          <Parameters>
+                            <Parameter Name="otserscd">
+                              <Value>=Fields!otserscd.Value</Value>
+                            </Parameter>
+                            <Parameter Name="otsercod">
+                              <Value>=Fields!otsercod.Value</Value>
+                            </Parameter>
+                            <Parameter Name="otnum">
+                              <Value>=Fields!otnum.Value</Value>
+                            </Parameter>
+                          </Parameters>
+                          <Visibility>
+                            <Hidden>=IsNothing(Fields!rptotInfoContadores.Value) OR Fields!rptotInfoContadores.Value&lt;&gt;2 OR Fields!otottcod.Value = "INSEDC"</Hidden>
+                          </Visibility>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Subreport>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.24647in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Subreport Name="Subreport6">
+                          <ReportName>TO013_OrdenTrabajo_TrabajoMaterialesDocumentos_EMMASA</ReportName>
+                          <Parameters>
+                            <Parameter Name="otserscd">
+                              <Value>=Fields!otserscd.Value</Value>
+                            </Parameter>
+                            <Parameter Name="otserccod">
+                              <Value>=Fields!otsercod.Value</Value>
+                            </Parameter>
+                            <Parameter Name="otnum">
+                              <Value>=Fields!otnum.Value</Value>
+                            </Parameter>
+                          </Parameters>
+                          <KeepTogether>true</KeepTogether>
+                          <Visibility>
+                            <Hidden>=Fields!otottcod.Value = "INSEDC"</Hidden>
+                          </Visibility>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Subreport>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.6702in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Rectangle Name="Rectangle3">
+                          <ReportItems>
+                            <Textbox Name="Textbox37">
+                              <CanGrow>true</CanGrow>
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>OBSERVACIONES</Value>
+                                      <Style>
+                                        <FontStyle>Normal</FontStyle>
+                                        <FontSize>11pt</FontSize>
+                                        <FontWeight>Bold</FontWeight>
+                                        <TextDecoration>None</TextDecoration>
+                                        <Color>White</Color>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <rd:DefaultName>Textbox26</rd:DefaultName>
+                              <Top>0.0175cm</Top>
+                              <Left>0.1cm</Left>
+                              <Height>0.23622in</Height>
+                              <Width>7.95137in</Width>
+                              <Style>
+                                <Border>
+                                  <Style>None</Style>
+                                </Border>
+                                <BackgroundColor>CornflowerBlue</BackgroundColor>
+                                <PaddingLeft>1pt</PaddingLeft>
+                                <PaddingRight>1pt</PaddingRight>
+                                <PaddingTop>1pt</PaddingTop>
+                                <PaddingBottom>1pt</PaddingBottom>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="otObsRealizacion">
+                              <CanGrow>true</CanGrow>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!otObsRealizacion.Value</Value>
+                                      <Style>
+                                        <FontSize>8pt</FontSize>
+                                        <FontWeight>Bold</FontWeight>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <rd:DefaultName>otObsRealizacion</rd:DefaultName>
+                              <Top>0.27089in</Top>
+                              <Left>0.15712cm</Left>
+                              <Height>0.375in</Height>
+                              <Width>7.95137in</Width>
+                              <ZIndex>1</ZIndex>
+                              <Style>
+                                <Border>
+                                  <Style>None</Style>
+                                </Border>
+                                <PaddingLeft>2pt</PaddingLeft>
+                                <PaddingRight>2pt</PaddingRight>
+                                <PaddingTop>2pt</PaddingTop>
+                                <PaddingBottom>2pt</PaddingBottom>
+                              </Style>
+                            </Textbox>
+                          </ReportItems>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Rectangle>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.25in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Subreport Name="Subreport3">
+                          <ReportName>TO013_OrdenTrabajo_Firma_EMMASA</ReportName>
+                          <Parameters>
+                            <Parameter Name="rptotLeyendaFirma">
+                              <Value>= IIF(ISNOTHING(Fields!rptotLeyendaFirma.Value), false, Fields!rptotLeyendaFirma.Value)</Value>
+                            </Parameter>
+                          </Parameters>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Subreport>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+              </TablixRows>
+            </TablixBody>
+            <TablixColumnHierarchy>
+              <TablixMembers>
+                <TablixMember />
+              </TablixMembers>
+            </TablixColumnHierarchy>
+            <TablixRowHierarchy>
+              <TablixMembers>
+                <TablixMember>
+                  <Group Name="otnum">
+                    <GroupExpressions>
+                      <GroupExpression>=Fields!otnum.Value</GroupExpression>
+                    </GroupExpressions>
+                    <PageBreak>
+                      <BreakLocation>Between</BreakLocation>
+                      <ResetPageNumber>true</ResetPageNumber>
+                    </PageBreak>
+                  </Group>
+                  <SortExpressions>
+                    <SortExpression>
+                      <Value>=Fields!otnum.Value</Value>
+                    </SortExpression>
+                  </SortExpressions>
+                  <TablixMembers>
+                    <TablixMember>
+                      <KeepWithGroup>After</KeepWithGroup>
+                      <RepeatOnNewPage>true</RepeatOnNewPage>
+                    </TablixMember>
+                    <TablixMember>
+                      <FixedData>true</FixedData>
+                      <Visibility>
+                        <Hidden>true</Hidden>
+                      </Visibility>
+                      <KeepWithGroup>After</KeepWithGroup>
+                      <RepeatOnNewPage>true</RepeatOnNewPage>
+                      <KeepTogether>true</KeepTogether>
+                    </TablixMember>
+                    <TablixMember>
+                      <Group Name="Details" />
+                      <TablixMembers>
+                        <TablixMember />
+                        <TablixMember />
+                        <TablixMember>
+                          <Visibility>
+                            <Hidden>=IsNothing(Fields!rptotInfoContadores.Value) OR Fields!rptotInfoContadores.Value&lt;&gt;1</Hidden>
+                          </Visibility>
+                        </TablixMember>
+                        <TablixMember>
+                          <Visibility>
+                            <Hidden>=IsNothing(Fields!rptotInfoContadores.Value) OR Fields!rptotInfoContadores.Value&lt;&gt;2</Hidden>
+                          </Visibility>
+                        </TablixMember>
+                        <TablixMember />
+                        <TablixMember>
+                          <FixedData>true</FixedData>
+                          <KeepWithGroup>Before</KeepWithGroup>
+                        </TablixMember>
+                      </TablixMembers>
+                    </TablixMember>
+                    <TablixMember>
+                      <FixedData>true</FixedData>
+                      <KeepWithGroup>Before</KeepWithGroup>
+                    </TablixMember>
+                  </TablixMembers>
+                  <FixedData>true</FixedData>
+                </TablixMember>
+              </TablixMembers>
+            </TablixRowHierarchy>
+            <DataSetName>OrdenesTrabajo</DataSetName>
+            <Height>2.8321in</Height>
+            <Width>20.3536cm</Width>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+            </Style>
+          </Tablix>
+        </ReportItems>
+        <Height>2.97793in</Height>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+        </Style>
+      </Body>
+      <Width>8.01323in</Width>
+      <Page>
+        <PageFooter>
+          <Height>0.28473in</Height>
+          <PrintOnFirstPage>true</PrintOnFirstPage>
+          <PrintOnLastPage>true</PrintOnLastPage>
+          <ReportItems>
+            <Textbox Name="Textbox7">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>="Página " &amp; Globals!PageNumber &amp; " de " &amp; Globals!TotalPages</Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                        <Color>CornflowerBlue</Color>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox7</rd:DefaultName>
+              <Top>0.03528cm</Top>
+              <Left>13.36785cm</Left>
+              <Height>0.6cm</Height>
+              <Width>6.8386cm</Width>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <VerticalAlign>Middle</VerticalAlign>
+                <PaddingRight>1pt</PaddingRight>
+                <PaddingBottom>1pt</PaddingBottom>
+              </Style>
+            </Textbox>
+          </ReportItems>
+          <Style>
+            <Border>
+              <Style>None</Style>
+            </Border>
+          </Style>
+        </PageFooter>
+        <LeftMargin>0.25in</LeftMargin>
+        <RightMargin>0.15in</RightMargin>
+        <TopMargin>0.19in</TopMargin>
+        <BottomMargin>0.11in</BottomMargin>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="sociedad">
+      <DataType>Integer</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+        </Values>
+      </DefaultValue>
+      <Prompt>sociedad</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="zonaContrato">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+        </Values>
+      </DefaultValue>
+      <Prompt>zona Contrato</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="serie">
+      <DataType>Integer</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+        </Values>
+      </DefaultValue>
+      <Prompt>serie</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="numeroD">
+      <DataType>Integer</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+        </Values>
+      </DefaultValue>
+      <Prompt>numero D</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="numeroH">
+      <DataType>Integer</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value>0</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>numero H</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="fechaSolicitudD">
+      <DataType>DateTime</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+        </Values>
+      </DefaultValue>
+      <Prompt>fecha Solicitud D</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="fechaSolicitudH">
+      <DataType>DateTime</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+        </Values>
+      </DefaultValue>
+      <Prompt>fecha Solicitud H</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="fechaRealizacionD">
+      <DataType>DateTime</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+        </Values>
+      </DefaultValue>
+      <Prompt>fecha Realizacion D</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="fechaRealizacionH">
+      <DataType>DateTime</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+        </Values>
+      </DefaultValue>
+      <Prompt>fecha Realizacion H</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="fechaCierreD">
+      <DataType>DateTime</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+        </Values>
+      </DefaultValue>
+      <Prompt>fecha Cierre D</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="fechaCierreH">
+      <DataType>DateTime</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+        </Values>
+      </DefaultValue>
+      <Prompt>fecha Cierre H</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="tipo">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+        </Values>
+      </DefaultValue>
+      <Prompt>tipo</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="tieneFCierre">
+      <DataType>Boolean</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+        </Values>
+      </DefaultValue>
+      <Prompt>tiene FCierre</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="tieneFrealizacion">
+      <DataType>Boolean</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+        </Values>
+      </DefaultValue>
+      <Prompt>tiene Frealizacion</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>d2ed3558-a6e0-4378-934c-633b5396b249</rd:ReportID>
+</Report>

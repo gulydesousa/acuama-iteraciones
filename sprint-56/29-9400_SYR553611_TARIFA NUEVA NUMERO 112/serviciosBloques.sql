@@ -1,0 +1,1 @@
+INSERT INTO serviciosBloques VALUES(4, 112, 'ACOMETIDAS')
